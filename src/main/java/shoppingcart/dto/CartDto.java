@@ -2,11 +2,14 @@ package shoppingcart.dto;
 
 public class CartDto {
 
-    private final Long cartId;
-    private final Long productId;
-    private final String name;
-    private final int price;
-    private final String imageUrl;
+    private Long cartId;
+    private Long productId;
+    private String name;
+    private int price;
+    private String imageUrl;
+
+    public CartDto() {
+    }
 
     public CartDto(final Long cartId, final ProductDto product) {
         this(cartId, product.getProductId(), product.getName(), product.getPrice(), product.getImageUrl());

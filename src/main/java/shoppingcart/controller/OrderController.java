@@ -22,7 +22,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity addOrder(@PathVariable final String customerName,
+    public ResponseEntity<Void> addOrder(@PathVariable final String customerName,
                                    @RequestBody @Valid final List<OrderRequestDto> orderDetails) {
         final Long orderId = orderService.addOrder(orderDetails, customerName);
         return ResponseEntity.created(

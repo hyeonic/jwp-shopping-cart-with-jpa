@@ -27,7 +27,7 @@ public class CartItemController {
     }
 
     @PostMapping
-    public ResponseEntity addCartItem(@Validated(Request.id.class) @RequestBody final ProductDto product,
+    public ResponseEntity<Void> addCartItem(@Validated(Request.id.class) @RequestBody final ProductDto product,
                                       @PathVariable final String customerName) {
         final Long cartId = cartService.addCart(product.getProductId(), customerName);
         final URI responseLocation = ServletUriComponentsBuilder
@@ -39,7 +39,7 @@ public class CartItemController {
     }
 
     @DeleteMapping("/{cartId}")
-    public ResponseEntity deleteCartItem(@PathVariable final String customerName,
+    public ResponseEntity<Void> deleteCartItem(@PathVariable final String customerName,
                                          @PathVariable final Long cartId) {
         cartService.deleteCart(customerName, cartId);
         return ResponseEntity.noContent().build();
