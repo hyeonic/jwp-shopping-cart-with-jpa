@@ -1,0 +1,6 @@
+[[Product]]
+== 상품
+
+=== 상품 등록
+
+operation::products/create[snippets='http-request,http-response']
