@@ -4,7 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import woowacourse.shoppingcart.dto.ProductDto;
+import woowacourse.shoppingcart.domain.Product;
 import woowacourse.shoppingcart.exception.InvalidProductException;
 
 import java.sql.PreparedStatement;
@@ -20,26 +20,26 @@ public class ProductDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Long save(final ProductDto productDto) {
+    public Long save(final Product product) {
         final String query = "INSERT INTO product (name, price, image_url) VALUES (?, ?, ?)";
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             final PreparedStatement preparedStatement =
                     connection.prepareStatement(query, new String[]{"id"});
-            preparedStatement.setString(1, productDto.getName());
-            preparedStatement.setInt(2, productDto.getPrice());
-            preparedStatement.setString(3, productDto.getImageUrl());
+            preparedStatement.setString(1, product.getName());
+            preparedStatement.setInt(2, product.getPrice());
+            preparedStatement.setString(3, product.getImageUrl());
             return preparedStatement;
         }, keyHolder);
 
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
-    public ProductDto findProductById(final Long productId) {
+    public Product findProductById(final Long productId) {
         try {
             final String query = "SELECT name, price, image_url FROM product WHERE id = ?";
             return jdbcTemplate.queryForObject(query, (resultSet, rowNumber) ->
-                    new ProductDto(
+                    new Product(
                             productId,
                             resultSet.getString("name"), resultSet.getInt("price"),
                             resultSet.getString("image_url")
@@ -50,11 +50,11 @@ public class ProductDao {
         }
     }
 
-    public List<ProductDto> findProducts() {
+    public List<Product> findProducts() {
         final String query = "SELECT id, name, price, image_url FROM product";
         return jdbcTemplate.query(query,
                 (resultSet, rowNumber) ->
-                        new ProductDto(
+                        new Product(
                                 resultSet.getLong("id"),
                                 resultSet.getString("name"),
                                 resultSet.getInt("price"),

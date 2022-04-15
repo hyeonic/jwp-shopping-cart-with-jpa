@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.jdbc.Sql;
-import woowacourse.shoppingcart.dto.OrderDetailDto;
+import woowacourse.shoppingcart.domain.OrderDetail;
 
 import java.util.List;
 
@@ -69,7 +69,7 @@ class OrdersDetailDaoTest {
         }
 
         //when
-        final List<OrderDetailDto> ordersDetailsByOrderId = ordersDetailDao
+        final List<OrderDetail> ordersDetailsByOrderId = ordersDetailDao
                 .findOrdersDetailsByOrderId(ordersId);
 
         //then

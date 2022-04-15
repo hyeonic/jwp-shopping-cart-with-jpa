@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import woowacourse.shoppingcart.dto.ProductDto;
+import woowacourse.shoppingcart.domain.Product;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +58,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     }
 
     public static ExtractableResponse<Response> 상품_등록_요청(String name, int price, String imageUrl) {
-        ProductDto productRequest = new ProductDto(name, price, imageUrl);
+        Product productRequest = new Product(name, price, imageUrl);
 
         return RestAssured
                 .given().log().all()
@@ -111,15 +111,15 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 상품_목록_포함됨(Long productId1, Long productId2, ExtractableResponse<Response> response) {
-        List<Long> resultProductIds = response.jsonPath().getList(".", ProductDto.class).stream()
-                .map(ProductDto::getProductId)
+        List<Long> resultProductIds = response.jsonPath().getList(".", Product.class).stream()
+                .map(Product::getId)
                 .collect(Collectors.toList());
         assertThat(resultProductIds).contains(productId1, productId2);
     }
 
     public static void 상품_조회됨(ExtractableResponse<Response> response, Long productId) {
-        ProductDto resultProduct = response.as(ProductDto.class);
-        assertThat(resultProduct.getProductId()).isEqualTo(productId);
+        Product resultProduct = response.as(Product.class);
+        assertThat(resultProduct.getId()).isEqualTo(productId);
     }
 
     public static void 상품_삭제됨(ExtractableResponse<Response> response) {

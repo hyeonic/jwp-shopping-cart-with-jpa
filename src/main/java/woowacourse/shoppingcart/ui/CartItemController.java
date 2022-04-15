@@ -4,8 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import woowacourse.shoppingcart.dto.CartDto;
-import woowacourse.shoppingcart.dto.ProductDto;
+import woowacourse.shoppingcart.domain.Cart;
+import woowacourse.shoppingcart.domain.Product;
 import woowacourse.shoppingcart.dto.Request;
 import woowacourse.shoppingcart.application.CartService;
 
@@ -22,14 +22,14 @@ public class CartItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CartDto>> getCartItems(@PathVariable final String customerName) {
+    public ResponseEntity<List<Cart>> getCartItems(@PathVariable final String customerName) {
         return ResponseEntity.ok().body(cartService.findCartsByCustomerName(customerName));
     }
 
     @PostMapping
-    public ResponseEntity<Void> addCartItem(@Validated(Request.id.class) @RequestBody final ProductDto product,
+    public ResponseEntity<Void> addCartItem(@Validated(Request.id.class) @RequestBody final Product product,
                                       @PathVariable final String customerName) {
-        final Long cartId = cartService.addCart(product.getProductId(), customerName);
+        final Long cartId = cartService.addCart(product.getId(), customerName);
         final URI responseLocation = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{cartId}")

@@ -8,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.jdbc.Sql;
-import woowacourse.shoppingcart.dto.ProductDto;
+import woowacourse.shoppingcart.domain.Product;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class ProductDaoTest {
         final String imageUrl = "www.test.com";
 
         // when
-        final Long productId = productDao.save(new ProductDto(name, price, imageUrl));
+        final Long productId = productDao.save(new Product(name, price, imageUrl));
 
         // then
         assertThat(productId).isEqualTo(1L);
@@ -48,14 +48,14 @@ public class ProductDaoTest {
         final String name = "초콜렛";
         final int price = 1_000;
         final String imageUrl = "www.test.com";
-        final Long productId = productDao.save(new ProductDto(name, price, imageUrl));
-        final ProductDto expectedProductDto = new ProductDto(productId, name, price, imageUrl);
+        final Long productId = productDao.save(new Product(name, price, imageUrl));
+        final Product expectedProduct = new Product(productId, name, price, imageUrl);
 
         // when
-        final ProductDto product = productDao.findProductById(productId);
+        final Product product = productDao.findProductById(productId);
 
         // then
-        assertThat(product).usingRecursiveComparison().isEqualTo(expectedProductDto);
+        assertThat(product).usingRecursiveComparison().isEqualTo(expectedProduct);
     }
 
     @DisplayName("상품 목록 조회")
@@ -66,7 +66,7 @@ public class ProductDaoTest {
         final int size = 0;
 
         // when
-        final List<ProductDto> products = productDao.findProducts();
+        final List<Product> products = productDao.findProducts();
 
         // then
         assertThat(products).size().isEqualTo(size);
@@ -80,7 +80,7 @@ public class ProductDaoTest {
         final int price = 1_000;
         final String imageUrl = "www.test.com";
 
-        final Long productId = productDao.save(new ProductDto(name, price, imageUrl));
+        final Long productId = productDao.save(new Product(name, price, imageUrl));
         final int beforeSize = productDao.findProducts().size();
 
         // when

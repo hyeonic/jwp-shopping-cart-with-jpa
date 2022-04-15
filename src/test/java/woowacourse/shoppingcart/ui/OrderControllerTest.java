@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import woowacourse.shoppingcart.dto.OrderDetailDto;
-import woowacourse.shoppingcart.dto.OrderRequestDto;
-import woowacourse.shoppingcart.dto.OrdersDto;
+import woowacourse.shoppingcart.domain.OrderDetail;
+import woowacourse.shoppingcart.dto.OrderRequest;
+import woowacourse.shoppingcart.domain.Orders;
 import woowacourse.shoppingcart.application.OrderService;
 
 import java.util.Arrays;
@@ -48,8 +48,8 @@ public class OrderControllerTest {
         final Long cartId2 = 1L;
         final int quantity2 = 5;
         final String customerName = "pobi";
-        final List<OrderRequestDto> requestDtos =
-                Arrays.asList(new OrderRequestDto(cartId, quantity), new OrderRequestDto(cartId2, quantity2));
+        final List<OrderRequest> requestDtos =
+                Arrays.asList(new OrderRequest(cartId, quantity), new OrderRequest(cartId2, quantity2));
 
         final Long expectedOrderId = 1L;
         when(orderService.addOrder(any(), eq(customerName)))
@@ -74,8 +74,8 @@ public class OrderControllerTest {
         // given
         final String customerName = "pobi";
         final Long orderId = 1L;
-        final OrdersDto expected = new OrdersDto(orderId,
-                Collections.singletonList(new OrderDetailDto(2L, 1_000, "banana", "imageUrl", 2)));
+        final Orders expected = new Orders(orderId,
+                Collections.singletonList(new OrderDetail(2L, 1_000, "banana", "imageUrl", 2)));
 
         when(orderService.findOrderById(customerName, orderId))
                 .thenReturn(expected);
@@ -84,7 +84,7 @@ public class OrderControllerTest {
         mockMvc.perform(get("/api/customers/" + customerName + "/orders/" + orderId)
         ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("orderId").value(orderId))
+                .andExpect(jsonPath("id").value(orderId))
                 .andExpect(jsonPath("orderDetails[0].productId").value(2L))
                 .andExpect(jsonPath("orderDetails[0].price").value(1_000))
                 .andExpect(jsonPath("orderDetails[0].name").value("banana"))
@@ -97,11 +97,11 @@ public class OrderControllerTest {
     void findOrders() throws Exception {
         // given
         final String customerName = "pobi";
-        final List<OrdersDto> expected = Arrays.asList(
-                new OrdersDto(1L, Collections.singletonList(
-                        new OrderDetailDto(1L, 1_000, "banana", "imageUrl", 2))),
-                new OrdersDto(2L, Collections.singletonList(
-                        new OrderDetailDto(2L, 2_000, "apple", "imageUrl2", 4)))
+        final List<Orders> expected = Arrays.asList(
+                new Orders(1L, Collections.singletonList(
+                        new OrderDetail(1L, 1_000, "banana", "imageUrl", 2))),
+                new Orders(2L, Collections.singletonList(
+                        new OrderDetail(2L, 2_000, "apple", "imageUrl2", 4)))
         );
 
         when(orderService.findOrdersByCustomerName(customerName))
@@ -111,14 +111,14 @@ public class OrderControllerTest {
         mockMvc.perform(get("/api/customers/" + customerName + "/orders/")
         ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].orderId").value(1L))
+                .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].orderDetails[0].productId").value(1L))
                 .andExpect(jsonPath("$[0].orderDetails[0].price").value(1_000))
                 .andExpect(jsonPath("$[0].orderDetails[0].name").value("banana"))
                 .andExpect(jsonPath("$[0].orderDetails[0].imageUrl").value("imageUrl"))
                 .andExpect(jsonPath("$[0].orderDetails[0].quantity").value(2))
 
-                .andExpect(jsonPath("$[1].orderId").value(2L))
+                .andExpect(jsonPath("$[1].id").value(2L))
                 .andExpect(jsonPath("$[1].orderDetails[0].productId").value(2L))
                 .andExpect(jsonPath("$[1].orderDetails[0].price").value(2_000))
                 .andExpect(jsonPath("$[1].orderDetails[0].name").value("apple"))

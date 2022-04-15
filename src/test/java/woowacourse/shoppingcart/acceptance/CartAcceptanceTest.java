@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import woowacourse.shoppingcart.dto.CartDto;
+import woowacourse.shoppingcart.domain.Cart;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +65,7 @@ public class CartAcceptanceTest extends AcceptanceTest {
 
     public static ExtractableResponse<Response> 장바구니_아이템_추가_요청(String userName, Long productId) {
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("productId", productId);
+        requestBody.put("id", productId);
 
         return RestAssured
                 .given().log().all()
@@ -109,8 +109,8 @@ public class CartAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 장바구니_아이템_목록_포함됨(ExtractableResponse<Response> response, Long... productIds) {
-        List<Long> resultProductIds = response.jsonPath().getList(".", CartDto.class).stream()
-                .map(CartDto::getProductId)
+        List<Long> resultProductIds = response.jsonPath().getList(".", Cart.class).stream()
+                .map(Cart::getProductId)
                 .collect(Collectors.toList());
         assertThat(resultProductIds).contains(productIds);
     }

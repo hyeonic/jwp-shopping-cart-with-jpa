@@ -3,7 +3,7 @@ package woowacourse.shoppingcart.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woowacourse.shoppingcart.dao.ProductDao;
-import woowacourse.shoppingcart.dto.ProductDto;
+import woowacourse.shoppingcart.domain.Product;
 
 import java.util.List;
 
@@ -16,15 +16,15 @@ public class ProductService {
         this.productDao = productDao;
     }
 
-    public List<ProductDto> findProducts() {
+    public List<Product> findProducts() {
         return productDao.findProducts();
     }
 
-    public Long addProduct(final ProductDto productDto) {
-        return productDao.save(productDto);
+    public Long addProduct(final Product product) {
+        return productDao.save(product);
     }
 
-    public ProductDto findProductById(final Long productId) {
+    public Product findProductById(final Long productId) {
         return productDao.findProductById(productId);
     }
 

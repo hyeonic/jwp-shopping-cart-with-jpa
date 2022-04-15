@@ -8,8 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import woowacourse.shoppingcart.dto.OrderRequestDto;
-import woowacourse.shoppingcart.dto.OrdersDto;
+import woowacourse.shoppingcart.dto.OrderRequest;
+import woowacourse.shoppingcart.domain.Orders;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,8 +42,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("주문하기")
     @Test
     void addOrder() {
-        List<OrderRequestDto> orderRequests = Stream.of(cartId1, cartId2)
-                .map(cartId -> new OrderRequestDto(cartId, 10))
+        List<OrderRequest> orderRequests = Stream.of(cartId1, cartId2)
+                .map(cartId -> new OrderRequest(cartId, 10))
                 .collect(Collectors.toList());
 
         ExtractableResponse<Response> response = 주문하기_요청(USER, orderRequests);
@@ -54,8 +54,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("주문 내역 조회")
     @Test
     void getOrders() {
-        Long orderId1 = 주문하기_요청_성공되어_있음(USER, Collections.singletonList(new OrderRequestDto(cartId1, 2)));
-        Long orderId2 = 주문하기_요청_성공되어_있음(USER, Collections.singletonList(new OrderRequestDto(cartId2, 5)));
+        Long orderId1 = 주문하기_요청_성공되어_있음(USER, Collections.singletonList(new OrderRequest(cartId1, 2)));
+        Long orderId2 = 주문하기_요청_성공되어_있음(USER, Collections.singletonList(new OrderRequest(cartId2, 5)));
 
         ExtractableResponse<Response> response = 주문_내역_조회_요청(USER);
 
@@ -67,8 +67,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void getOrder() {
         Long orderId = 주문하기_요청_성공되어_있음(USER, Arrays.asList(
-                new OrderRequestDto(cartId1, 2),
-                new OrderRequestDto(cartId2, 4)
+                new OrderRequest(cartId1, 2),
+                new OrderRequest(cartId2, 4)
         ));
 
         ExtractableResponse<Response> response = 주문_단일_조회_요청(USER, orderId);
@@ -77,7 +77,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         주문_조회됨(response, orderId);
     }
 
-    public static ExtractableResponse<Response> 주문하기_요청(String userName, List<OrderRequestDto> orderRequests) {
+    public static ExtractableResponse<Response> 주문하기_요청(String userName, List<OrderRequest> orderRequests) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,7 +110,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         assertThat(response.header("Location")).isNotBlank();
     }
 
-    public static Long 주문하기_요청_성공되어_있음(String userName, List<OrderRequestDto> orderRequests) {
+    public static Long 주문하기_요청_성공되어_있음(String userName, List<OrderRequest> orderRequests) {
         ExtractableResponse<Response> response = 주문하기_요청(userName, orderRequests);
         return Long.parseLong(response.header("Location").split("/orders/")[1]);
     }
@@ -120,14 +120,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     }
 
     public static void 주문_내역_포함됨(ExtractableResponse<Response> response, Long... orderIds) {
-        List<Long> resultOrderIds = response.jsonPath().getList(".", OrdersDto.class).stream()
-                .map(OrdersDto::getOrderId)
+        List<Long> resultOrderIds = response.jsonPath().getList(".", Orders.class).stream()
+                .map(Orders::getId)
                 .collect(Collectors.toList());
         assertThat(resultOrderIds).contains(orderIds);
     }
 
     private void 주문_조회됨(ExtractableResponse<Response> response, Long orderId) {
-        OrdersDto resultOrder = response.as(OrdersDto.class);
-        assertThat(resultOrder.getOrderId()).isEqualTo(orderId);
+        Orders resultOrder = response.as(Orders.class);
+        assertThat(resultOrder.getId()).isEqualTo(orderId);
     }
 }
