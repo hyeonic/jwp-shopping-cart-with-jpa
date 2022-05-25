@@ -23,7 +23,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
     // parameter에 @AuthenticationPrincipal이 붙어있는 경우 동작
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        // TODO: 유효한 로그인인 경우 LoginMember 만들어서 응답하기
+        // TODO: 유효한 로그인인 경우 로그인한 사용자 객체를 만들어서 응답하기
         return null;
     }
 }
