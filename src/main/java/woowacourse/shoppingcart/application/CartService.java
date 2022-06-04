@@ -40,12 +40,12 @@ public class CartService {
     }
 
     private List<Long> findCartIdsByCustomerName(final String customerName) {
-        final Long customerId = customerDao.findIdByUserName(customerName);
+        final Long customerId = customerDao.findIdByUsername(customerName);
         return cartItemDao.findIdsByCustomerId(customerId);
     }
 
     public Long addCart(final Long productId, final String customerName) {
-        final Long customerId = customerDao.findIdByUserName(customerName);
+        final Long customerId = customerDao.findIdByUsername(customerName);
         try {
             return cartItemDao.addCartItem(customerId, productId);
         } catch (Exception e) {

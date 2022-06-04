@@ -2,26 +2,93 @@ package woowacourse.shoppingcart.dao;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import woowacourse.shoppingcart.exception.InvalidCustomerException;
+import woowacourse.shoppingcart.domain.customer.Customer;
+import woowacourse.shoppingcart.exception.NoSuchCustomerException;
 
-import java.util.Locale;
+import java.util.Optional;
 
 @Repository
 public class CustomerDao {
 
-    private final JdbcTemplate jdbcTemplate;
+    private static final String TABLE_NAME = "customer";
+    private static final String KEY_NAME = "id";
 
-    public CustomerDao(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
+
+    public CustomerDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName(TABLE_NAME)
+                .usingGeneratedKeyColumns(KEY_NAME);
     }
 
-    public Long findIdByUserName(final String userName) {
+    public Customer save(Customer customer) {
+        SqlParameterSource parameterSource = new BeanPropertySqlParameterSource(customer);
+        Long id = simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
+        return new Customer(id, customer);
+    }
+
+    public Long findIdByUsername(String username) {
         try {
-            final String query = "SELECT id FROM customer WHERE username = ?";
-            return jdbcTemplate.queryForObject(query, Long.class, userName.toLowerCase(Locale.ROOT));
-        } catch (final EmptyResultDataAccessException e) {
-            throw new InvalidCustomerException();
+            String sql = "SELECT id FROM customer WHERE username = :username";
+            SqlParameterSource parameterSource = new MapSqlParameterSource("username", username);
+            return jdbcTemplate.queryForObject(sql, parameterSource, Long.class);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NoSuchCustomerException();
         }
+    }
+
+    public boolean existsByUsernameAndPassword(String username, String password) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM customer WHERE username = :username AND password = :password)";
+
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("username", username)
+                .addValue("password", password);
+
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
+    }
+
+    public Optional<Customer> findByUsername(String username) {
+        try {
+            String sql = "SELECT id, username, email, password, address, phone_number "
+                    + "FROM customer WHERE username = :username";
+            SqlParameterSource parameterSource = new MapSqlParameterSource("username", username);
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject(sql, parameterSource, generateCustomerMapper()));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    private RowMapper<Customer> generateCustomerMapper() {
+        return (resultSet, rowNum) ->
+                new Customer(
+                        resultSet.getLong("id"),
+                        resultSet.getString("username"),
+                        resultSet.getString("email"),
+                        resultSet.getString("password"),
+                        resultSet.getString("address"),
+                        resultSet.getString("phone_number")
+                );
+    }
+
+    public void update(Customer customer) {
+        String sql = "UPDATE customer SET address = :address, phone_number = :phoneNumber WHERE username = :username";
+        SqlParameterSource parameterSource = new BeanPropertySqlParameterSource(customer);
+        jdbcTemplate.update(sql, parameterSource);
+    }
+
+    public void delete(Customer customer) {
+        String sql = "DELETE FROM customer WHERE username = :username";
+        SqlParameterSource parameterSource = new BeanPropertySqlParameterSource(customer);
+        jdbcTemplate.update(sql, parameterSource);
     }
 }
