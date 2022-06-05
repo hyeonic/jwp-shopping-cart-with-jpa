@@ -12,6 +12,10 @@ public class Product {
     private Product() {
     }
 
+    public Product(Long id, Product product) {
+        this(id, product.getName(), product.getPrice(), product.getImageUrl());
+    }
+
     public Product(String name, int price, String imageUrl) {
         this(null, name, price, imageUrl);
     }

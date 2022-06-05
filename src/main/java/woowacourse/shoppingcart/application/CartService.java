@@ -8,6 +8,7 @@ import woowacourse.shoppingcart.dao.ProductDao;
 import woowacourse.shoppingcart.domain.Cart;
 import woowacourse.shoppingcart.domain.Product;
 import woowacourse.shoppingcart.exception.InvalidProductException;
+import woowacourse.shoppingcart.exception.NoSuchProductException;
 import woowacourse.shoppingcart.exception.NotInCustomerCartItemException;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class CartService {
         final List<Cart> carts = new ArrayList<>();
         for (final Long cartId : cartIds) {
             final Long productId = cartItemDao.findProductIdById(cartId);
-            final Product product = productDao.findProductById(productId);
+            final Product product = getProduct(productId);
             carts.add(new Cart(cartId, product));
         }
         return carts;
@@ -64,5 +65,10 @@ public class CartService {
             return;
         }
         throw new NotInCustomerCartItemException();
+    }
+
+    private Product getProduct(Long productId) {
+        return productDao.findById(productId)
+                .orElseThrow(NoSuchProductException::new);
     }
 }

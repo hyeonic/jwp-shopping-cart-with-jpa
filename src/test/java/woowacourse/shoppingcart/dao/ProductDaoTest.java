@@ -31,9 +31,8 @@ public class ProductDaoTest {
     @DisplayName("Product를 저장하면 product를 반환한다.")
     @Test
     void save() {
-        Long productId = productDao.save(ONE_PRODUCT);
+        Product product = productDao.save(ONE_PRODUCT);
 
-        Product product = productDao.findProductById(productId);
         assertAll(() -> {
                     assertThat(product.getName()).isEqualTo(ONE_PRODUCT_NAME);
                     assertThat(product.getPrice()).isEqualTo(ONE_PRODUCT_PRICE);
@@ -45,9 +44,7 @@ public class ProductDaoTest {
     @DisplayName("productID를 상품을 찾으면 product를 반환한다.")
     @Test
     void findProductById() {
-        Long productId = productDao.save(ONE_PRODUCT);
-
-        Product product = productDao.findProductById(productId);
+        Product product = productDao.save(ONE_PRODUCT);
 
         assertAll(() -> {
                     assertThat(product.getName()).isEqualTo(ONE_PRODUCT_NAME);
@@ -68,10 +65,10 @@ public class ProductDaoTest {
     @DisplayName("싱품을 삭제한다.")
     @Test
     void deleteProduct() {
-        Long productId = productDao.save(ONE_PRODUCT);
+        Product product = productDao.save(ONE_PRODUCT);
         int beforeSize = productDao.findProducts().size();
 
-        productDao.delete(productId);
+        productDao.delete(product.getId());
 
         int afterSize = productDao.findProducts().size();
         assertThat(beforeSize - 1).isEqualTo(afterSize);

@@ -7,6 +7,7 @@ import woowacourse.shoppingcart.domain.Product;
 
 import java.util.List;
 import woowacourse.shoppingcart.dto.product.ProductSaveRequest;
+import woowacourse.shoppingcart.exception.NoSuchProductException;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,11 +25,13 @@ public class ProductService {
 
     @Transactional
     public Long save(ProductSaveRequest request) {
-        return productDao.save(request.toProduct());
+        Product product = productDao.save(request.toProduct());
+        return product.getId();
     }
 
     public Product findProductById(Long productId) {
-        return productDao.findProductById(productId);
+        return productDao.findById(productId)
+                .orElseThrow(NoSuchProductException::new);
     }
 
     @Transactional
