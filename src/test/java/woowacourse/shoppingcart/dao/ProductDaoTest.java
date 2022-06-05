@@ -37,11 +37,12 @@ public class ProductDaoTest {
                     assertThat(product.getName()).isEqualTo(ONE_PRODUCT_NAME);
                     assertThat(product.getPrice()).isEqualTo(ONE_PRODUCT_PRICE);
                     assertThat(product.getImageUrl()).isEqualTo(ONE_PRODUCT_IMAGE_URL);
+                    assertThat(product.isDeleted()).isFalse();
                 }
         );
     }
 
-    @DisplayName("productID를 상품을 찾으면 product를 반환한다.")
+    @DisplayName("productId의 상품을 찾으면 product를 반환한다.")
     @Test
     void findProductById() {
         Product product = productDao.save(ONE_PRODUCT);
@@ -50,6 +51,7 @@ public class ProductDaoTest {
                     assertThat(product.getName()).isEqualTo(ONE_PRODUCT_NAME);
                     assertThat(product.getPrice()).isEqualTo(ONE_PRODUCT_PRICE);
                     assertThat(product.getImageUrl()).isEqualTo(ONE_PRODUCT_IMAGE_URL);
+                    assertThat(product.isDeleted()).isFalse();
                 }
         );
     }

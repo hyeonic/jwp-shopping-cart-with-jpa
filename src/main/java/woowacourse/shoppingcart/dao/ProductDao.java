@@ -22,9 +22,10 @@ public class ProductDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
-    public ProductDao(final JdbcTemplate jdbcTemplate) {
+    public ProductDao(JdbcTemplate jdbcTemplate) {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName(TABLE_NAME)
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns(KEY_NAME);
     }
 
@@ -36,7 +37,7 @@ public class ProductDao {
 
     public Optional<Product> findById(Long id) {
         try {
-            String sql = "SELECT id, name, price, image_url FROM product WHERE id = :id";
+            String sql = "SELECT id, name, price, image_url, deleted FROM product WHERE id = :id";
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
             return Optional.ofNullable(
                     namedParameterJdbcTemplate.queryForObject(sql, parameterSource, generateProductMapper()));
@@ -46,7 +47,7 @@ public class ProductDao {
     }
 
     public List<Product> findAll() {
-        String sql = "SELECT id, name, price, image_url FROM product";
+        String sql = "SELECT id, name, price, image_url, deleted FROM product WHERE deleted = false";
         return namedParameterJdbcTemplate.query(sql, generateProductMapper());
     }
 
@@ -55,12 +56,13 @@ public class ProductDao {
                 resultSet.getLong("id"),
                 resultSet.getString("name"),
                 resultSet.getInt("price"),
-                resultSet.getString("image_url")
+                resultSet.getString("image_url"),
+                resultSet.getBoolean("deleted")
         );
     }
 
     public void delete(Product product) {
-        String sql = "DELETE FROM product WHERE id = :id";
+        String sql = "UPDATE product SET deleted = true WHERE id = :id";
         SqlParameterSource parameterSource = new MapSqlParameterSource("id", product.getId());
         namedParameterJdbcTemplate.update(sql, parameterSource);
     }

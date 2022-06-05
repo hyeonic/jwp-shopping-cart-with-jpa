@@ -40,15 +40,15 @@ public class ProductController {
         return ResponseEntity.created(uri).build();
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> product(@PathVariable Long productId) {
-        ProductResponse response = productService.findById(productId);
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> product(@PathVariable Long id) {
+        ProductResponse response = productService.findById(id);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> delete(@PathVariable Long productId) {
-        productService.deleteProductById(productId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

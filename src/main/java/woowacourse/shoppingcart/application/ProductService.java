@@ -40,7 +40,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProductById(Long id) {
+    public void deleteById(Long id) {
         Product product = getProduct(id);
         productDao.delete(product);
     }
