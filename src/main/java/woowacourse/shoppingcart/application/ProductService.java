@@ -6,13 +6,15 @@ import woowacourse.shoppingcart.dao.ProductDao;
 import woowacourse.shoppingcart.domain.Product;
 
 import java.util.List;
+import woowacourse.shoppingcart.dto.product.ProductSaveRequest;
 
 @Service
-@Transactional(rollbackFor = Exception.class)
+@Transactional(readOnly = true)
 public class ProductService {
+
     private final ProductDao productDao;
 
-    public ProductService(final ProductDao productDao) {
+    public ProductService(ProductDao productDao) {
         this.productDao = productDao;
     }
 
@@ -20,15 +22,17 @@ public class ProductService {
         return productDao.findProducts();
     }
 
-    public Long addProduct(final Product product) {
-        return productDao.save(product);
+    @Transactional
+    public Long save(ProductSaveRequest request) {
+        return productDao.save(request.toProduct());
     }
 
-    public Product findProductById(final Long productId) {
+    public Product findProductById(Long productId) {
         return productDao.findProductById(productId);
     }
 
-    public void deleteProductById(final Long productId) {
+    @Transactional
+    public void deleteProductById(Long productId) {
         productDao.delete(productId);
     }
 }
