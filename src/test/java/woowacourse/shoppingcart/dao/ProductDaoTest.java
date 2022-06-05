@@ -57,7 +57,7 @@ public class ProductDaoTest {
     @DisplayName("상품 목록을 조회한다.")
     @Test
     void getProducts() {
-        List<Product> products = productDao.findProducts();
+        List<Product> products = productDao.findAll();
 
         assertThat(products.size()).isEqualTo(0);
     }
@@ -66,11 +66,11 @@ public class ProductDaoTest {
     @Test
     void deleteProduct() {
         Product product = productDao.save(ONE_PRODUCT);
-        int beforeSize = productDao.findProducts().size();
+        int beforeSize = productDao.findAll().size();
 
-        productDao.delete(product.getId());
+        productDao.delete(product);
 
-        int afterSize = productDao.findProducts().size();
+        int afterSize = productDao.findAll().size();
         assertThat(beforeSize - 1).isEqualTo(afterSize);
     }
 }

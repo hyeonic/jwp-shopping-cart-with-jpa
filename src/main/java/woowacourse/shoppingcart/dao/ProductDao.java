@@ -45,7 +45,7 @@ public class ProductDao {
         }
     }
 
-    public List<Product> findProducts() {
+    public List<Product> findAll() {
         String sql = "SELECT id, name, price, image_url FROM product";
         return namedParameterJdbcTemplate.query(sql, generateProductMapper());
     }
@@ -59,9 +59,9 @@ public class ProductDao {
         );
     }
 
-    public void delete(final Long id) {
+    public void delete(Product product) {
         String sql = "DELETE FROM product WHERE id = :id";
-        SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
+        SqlParameterSource parameterSource = new MapSqlParameterSource("id", product.getId());
         namedParameterJdbcTemplate.update(sql, parameterSource);
     }
 }

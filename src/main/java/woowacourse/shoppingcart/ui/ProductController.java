@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import woowacourse.shoppingcart.application.ProductService;
-import woowacourse.shoppingcart.domain.Product;
+import woowacourse.shoppingcart.dto.product.ProductResponse;
 import woowacourse.shoppingcart.dto.product.ProductSaveRequest;
 
 @RestController
@@ -26,27 +26,28 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> products() {
-        return ResponseEntity.ok(productService.findProducts());
+    public ResponseEntity<List<ProductResponse>> products() {
+        return ResponseEntity.ok(productService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<Void> add(@RequestBody final ProductSaveRequest request) {
-        final Long productId = productService.save(request);
-        final URI uri = ServletUriComponentsBuilder
+    public ResponseEntity<Void> add(@RequestBody ProductSaveRequest request) {
+        ProductResponse response = productService.save(request);
+        URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("/" + productId)
+                .path("/" + response.getId())
                 .build().toUri();
         return ResponseEntity.created(uri).build();
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<Product> product(@PathVariable final Long productId) {
-        return ResponseEntity.ok(productService.findProductById(productId));
+    public ResponseEntity<ProductResponse> product(@PathVariable Long productId) {
+        ProductResponse response = productService.findById(productId);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> delete(@PathVariable final Long productId) {
+    public ResponseEntity<Void> delete(@PathVariable Long productId) {
         productService.deleteProductById(productId);
         return ResponseEntity.noContent().build();
     }
