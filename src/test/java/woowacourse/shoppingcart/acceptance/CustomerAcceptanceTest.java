@@ -137,7 +137,7 @@ public class CustomerAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get("/api/customers/me")
                 .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract();
     }
 
