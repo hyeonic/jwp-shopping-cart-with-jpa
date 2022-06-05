@@ -3,6 +3,7 @@ package woowacourse.shoppingcart.application;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import woowacourse.shoppingcart.dao.*;
+import woowacourse.shoppingcart.domain.CartItem;
 import woowacourse.shoppingcart.domain.OrderDetail;
 import woowacourse.shoppingcart.dto.OrderRequest;
 import woowacourse.shoppingcart.domain.Orders;
@@ -12,6 +13,7 @@ import woowacourse.shoppingcart.exception.InvalidOrderException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import woowacourse.shoppingcart.exception.NoSuchCartItemException;
 import woowacourse.shoppingcart.exception.NoSuchProductException;
 
 @Service
@@ -39,14 +41,19 @@ public class OrderService {
 
         for (final OrderRequest orderDetail : orderDetailRequests) {
             final Long cartId = orderDetail.getCartId();
-            final Long productId = cartItemDao.findProductIdById(cartId);
+            final CartItem cartItem = getCartItem(cartId);
             final int quantity = orderDetail.getQuantity();
 
-            ordersDetailDao.addOrdersDetail(ordersId, productId, quantity);
-            cartItemDao.deleteCartItem(cartId);
+            ordersDetailDao.addOrdersDetail(ordersId, cartItem.getProduct().getId(), quantity);
+            cartItemDao.deleteById(cartId);
         }
 
         return ordersId;
+    }
+
+    private CartItem getCartItem(Long cartId) {
+        return cartItemDao.findById(cartId)
+                .orElseThrow(NoSuchCartItemException::new);
     }
 
     public Orders findOrderById(final String customerName, final Long orderId) {
