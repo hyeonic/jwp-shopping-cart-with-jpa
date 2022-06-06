@@ -15,17 +15,17 @@ import woowacourse.shoppingcart.dto.orders.OrdersResponse;
 
 @RestController
 @RequestMapping("/api/customers/{customerName}/orders")
-public class OrderController {
+public class OrdersController {
 
     private final OrdersService ordersService;
 
-    public OrderController(OrdersService ordersService) {
+    public OrdersController(OrdersService ordersService) {
         this.ordersService = ordersService;
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@PathVariable String customerName,
-                                     @RequestBody @Valid List<OrdersDetailRequest> orderDetails) {
+    public ResponseEntity<Void> addOrders(@PathVariable String customerName,
+                                          @RequestBody @Valid List<OrdersDetailRequest> orderDetails) {
         OrdersResponse ordersResponse = ordersService.save(orderDetails, customerName);
         return ResponseEntity.created(
                 URI.create("/api/" + customerName + "/orders/" + ordersResponse.getId())).build();

@@ -3,6 +3,7 @@ package woowacourse.shoppingcart.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static woowacourse.shoppingcart.CustomerFixtures.MAT_SAVE_REQUEST;
 import static woowacourse.shoppingcart.ProductFixtures.ONE_PRODUCT_SAVE_REQUEST;
+import static woowacourse.shoppingcart.ProductFixtures.TWO_PRODUCT_SAVE_REQUEST;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -46,13 +47,18 @@ class OrdersServiceTest {
     @Test
     void save() {
         String username = customerService.save(MAT_SAVE_REQUEST).getUsername();
-        ProductResponse savedProduct = productService.save(ONE_PRODUCT_SAVE_REQUEST);
-        CartItemResponse savedCartItem = cartItemService.save(
-                username, new CartItemSaveRequest(savedProduct.getId(), 2));
-        OrdersDetailRequest ordersDetailRequest = new OrdersDetailRequest(savedCartItem.getId(), 2);
+        ProductResponse savedProduct1 = productService.save(ONE_PRODUCT_SAVE_REQUEST);
+        ProductResponse savedProduct2 = productService.save(TWO_PRODUCT_SAVE_REQUEST);
+        CartItemResponse savedCartItem1 = cartItemService.save(
+                username, new CartItemSaveRequest(savedProduct1.getId(), 2));
+        CartItemResponse savedCartItem2 = cartItemService.save(
+                username, new CartItemSaveRequest(savedProduct2.getId(), 3));
+        OrdersDetailRequest ordersDetailRequest1 = new OrdersDetailRequest(savedCartItem1.getId(), 2);
+        OrdersDetailRequest ordersDetailRequest2 = new OrdersDetailRequest(savedCartItem2.getId(), 3);
 
-        OrdersResponse ordersResponse = ordersService.save(List.of(ordersDetailRequest), username);
+        OrdersResponse ordersResponse = ordersService.save(
+                List.of(ordersDetailRequest1, ordersDetailRequest2), username);
 
-        assertThat(ordersResponse.getOrdersDetail()).hasSize(1);
+        assertThat(ordersResponse.getOrdersDetail()).hasSize(2);
     }
 }
