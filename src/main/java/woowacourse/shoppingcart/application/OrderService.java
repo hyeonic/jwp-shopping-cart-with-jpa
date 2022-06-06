@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import woowacourse.shoppingcart.dao.*;
 import woowacourse.shoppingcart.domain.CartItem;
 import woowacourse.shoppingcart.domain.OrderDetail;
+import woowacourse.shoppingcart.domain.customer.Customer;
 import woowacourse.shoppingcart.dto.OrderRequest;
 import woowacourse.shoppingcart.domain.Orders;
 import woowacourse.shoppingcart.domain.Product;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import woowacourse.shoppingcart.exception.NoSuchCartItemException;
+import woowacourse.shoppingcart.exception.NoSuchCustomerException;
 import woowacourse.shoppingcart.exception.NoSuchProductException;
 
 @Service
@@ -36,7 +38,7 @@ public class OrderService {
     }
 
     public Long addOrder(final List<OrderRequest> orderDetailRequests, final String customerName) {
-        final Long customerId = customerDao.findIdByUsername(customerName);
+        final Long customerId = getCustomer(customerName).getId();
         final Long ordersId = orderDao.addOrders(customerId);
 
         for (final OrderRequest orderDetail : orderDetailRequests) {
@@ -62,7 +64,7 @@ public class OrderService {
     }
 
     private void validateOrderIdByCustomerName(final String customerName, final Long orderId) {
-        final Long customerId = customerDao.findIdByUsername(customerName);
+        final Long customerId = getCustomer(customerName).getId();
 
         if (!orderDao.isValidOrderId(customerId, orderId)) {
             throw new InvalidOrderException("유저에게는 해당 order_id가 없습니다.");
@@ -70,12 +72,17 @@ public class OrderService {
     }
 
     public List<Orders> findOrdersByCustomerName(final String customerName) {
-        final Long customerId = customerDao.findIdByUsername(customerName);
+        final Long customerId = getCustomer(customerName).getId();
         final List<Long> orderIds = orderDao.findOrderIdsByCustomerId(customerId);
 
         return orderIds.stream()
-                .map(orderId -> findOrderResponseDtoByOrderId(orderId))
+                .map(this::findOrderResponseDtoByOrderId)
                 .collect(Collectors.toList());
+    }
+
+    private Customer getCustomer(String customerName) {
+        return customerDao.findByUsername(customerName)
+                .orElseThrow(NoSuchCustomerException::new);
     }
 
     private Orders findOrderResponseDtoByOrderId(final Long orderId) {

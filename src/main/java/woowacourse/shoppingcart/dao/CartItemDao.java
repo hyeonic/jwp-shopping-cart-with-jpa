@@ -20,11 +20,11 @@ public class CartItemDao {
     private static final String TABLE_NAME = "cart_item";
     private static final String KEY_NAME = "id";
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
     public CartItemDao(JdbcTemplate jdbcTemplate) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns(KEY_NAME);
@@ -53,7 +53,7 @@ public class CartItemDao {
                 + "WHERE ci.customer_id = :customerId";
 
         SqlParameterSource parameterSource = new MapSqlParameterSource("customerId", customerId);
-        return namedParameterJdbcTemplate.query(sql, parameterSource, generateCartItemMapper());
+        return jdbcTemplate.query(sql, parameterSource, generateCartItemMapper());
     }
 
     public Optional<CartItem> findById(Long id) {
@@ -70,8 +70,7 @@ public class CartItemDao {
                     + "WHERE ci.id = :id";
 
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
-            return Optional.ofNullable(
-                    namedParameterJdbcTemplate.queryForObject(sql, parameterSource, generateCartItemMapper()));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, parameterSource, generateCartItemMapper()));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -102,9 +101,18 @@ public class CartItemDao {
         };
     }
 
+    public boolean existsByIdAndCustomerId(Long id, Long customerId) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM cart_item WHERE id = :id AND customer_id = :customerId)";
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("id", id)
+                .addValue("customerId", customerId);
+
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
+    }
+
     public void deleteById(Long id) {
         String sql = "DELETE FROM cart_item WHERE id = :id";
         SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
-        namedParameterJdbcTemplate.update(sql, parameterSource);
+        jdbcTemplate.update(sql, parameterSource);
     }
 }

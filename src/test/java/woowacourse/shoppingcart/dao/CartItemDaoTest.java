@@ -3,6 +3,7 @@ package woowacourse.shoppingcart.dao;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static woowacourse.shoppingcart.CustomerFixtures.MAT;
+import static woowacourse.shoppingcart.CustomerFixtures.YAHO;
 import static woowacourse.shoppingcart.ProductFixtures.ONE_PRODUCT;
 
 import java.util.List;
@@ -75,5 +76,46 @@ public class CartItemDaoTest {
             assertThat(foundCartItem.getCustomer()).isEqualTo(savedCustomer);
             assertThat(foundCartItem.getProduct()).isEqualTo(savedProduct);
         });
+    }
+    
+    @DisplayName("customer id와 cart id를 기반으로 cart item의 존재 유무를 확인한다.")
+    @Test
+    void existsByIdAndCustomerId() {
+        Customer savedCustomer = customerDao.save(MAT);
+        Product savedProduct = productDao.save(ONE_PRODUCT);
+        CartItem cartItem = new CartItem(savedCustomer, savedProduct, 15);
+        CartItem savedCartItem = cartItemDao.save(cartItem);
+
+        boolean result = cartItemDao.existsByIdAndCustomerId(savedCartItem.getId(), savedCustomer.getId());
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("customer id와 cart id를 기반으로 cart item의 존재 유무를 확인한다.")
+    @Test
+    void existsByIdAndCustomerId_error_notExists() {
+        Customer savedCustomer1 = customerDao.save(MAT);
+        Customer savedCustomer2 = customerDao.save(YAHO);
+        Product savedProduct = productDao.save(ONE_PRODUCT);
+        CartItem cartItem = new CartItem(savedCustomer1, savedProduct, 15);
+        CartItem savedCartItem = cartItemDao.save(cartItem);
+
+        boolean result = cartItemDao.existsByIdAndCustomerId(savedCartItem.getId(), savedCustomer2.getId());
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("cart item을 삭제한다.")
+    @Test
+    void deleteById() {
+        Customer savedCustomer = customerDao.save(MAT);
+        Product savedProduct = productDao.save(ONE_PRODUCT);
+        CartItem cartItem = new CartItem(savedCustomer, savedProduct, 15);
+        CartItem savedCartItem = cartItemDao.save(cartItem);
+
+        cartItemDao.deleteById(savedCartItem.getId());
+
+        List<CartItem> cartItems = cartItemDao.findByCustomerId(savedCustomer.getId());
+        assertThat(cartItems.size()).isEqualTo(0);
     }
 }

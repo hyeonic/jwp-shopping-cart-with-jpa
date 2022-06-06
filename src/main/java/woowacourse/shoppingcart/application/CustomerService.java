@@ -32,6 +32,10 @@ public class CustomerService {
         return new CustomerResponse(customer);
     }
 
+    public Customer findByUsername(String username) {
+        return getCustomer(username);
+    }
+
     public void validateUsernameAndPassword(String username, String password) {
         if (!customerDao.existsByUsernameAndPassword(username, password)) {
             throw new InvalidCustomerException();
