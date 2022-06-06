@@ -2,12 +2,13 @@ package woowacourse.shoppingcart.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import woowacourse.shoppingcart.domain.OrderDetail;
+import woowacourse.shoppingcart.domain.OrdersDetail;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 import woowacourse.shoppingcart.domain.Orders;
 import woowacourse.shoppingcart.domain.Product;
@@ -16,27 +17,30 @@ import woowacourse.shoppingcart.domain.customer.Customer;
 @Repository
 public class OrdersDetailDao {
 
-    private final JdbcTemplate jdbcTemplate;
+    private static final String TABLE_NAME = "orders_detail";
+    private static final String KEY_NAME = "id";
 
-    public OrdersDetailDao(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final SimpleJdbcInsert simpleJdbcInsert;
+
+    public OrdersDetailDao(JdbcTemplate jdbcTemplate) {
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName(TABLE_NAME)
+                .usingGeneratedKeyColumns(KEY_NAME);
     }
 
-    public Long addOrdersDetail(final Long ordersId, final Long productId, final int quantity) {
-        final String sql = "INSERT INTO orders_detail (orders_id, product_id, quantity) VALUES (?, ?, ?)";
-        final KeyHolder keyHolder = new GeneratedKeyHolder();
+    public OrdersDetail save(OrdersDetail ordersDetail) {
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("orders_id", ordersDetail.getOrders().getId())
+                .addValue("product_id", ordersDetail.getProduct().getId())
+                .addValue("quantity", ordersDetail.getQuantity());
 
-        jdbcTemplate.update(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(sql, new String[]{"id"});
-            preparedStatement.setLong(1, ordersId);
-            preparedStatement.setLong(2, productId);
-            preparedStatement.setLong(3, quantity);
-            return preparedStatement;
-        }, keyHolder);
-        return keyHolder.getKey().longValue();
+        Long id = simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
+        return new OrdersDetail(id, ordersDetail);
     }
 
-    public List<OrderDetail> findOrdersDetailsByOrderId(final Long orderId) {
+    public List<OrdersDetail> findByOrdersId(Long ordersId) {
         String sql = "SELECT od.id as id, od.quantity as quantity, "
                 + "o.id as orderId, "
                 + "c.id as customerId, c.username as customerUsername, c.email as customerEmail, "
@@ -48,12 +52,13 @@ public class OrdersDetailDao {
                 + "JOIN orders o ON od.orders_id = o.id "
                 + "JOIN product p ON od.product_id = p.id "
                 + "JOIN customer c ON o.customer_id = c.id "
-                + "WHERE orders_id = ?";
+                + "WHERE orders_id = :ordersId";
 
-        return jdbcTemplate.query(sql, generateOrderDetailMapper(), orderId);
+        SqlParameterSource parameterSource = new MapSqlParameterSource("ordersId", ordersId);
+        return namedParameterJdbcTemplate.query(sql, parameterSource, generateOrderDetailMapper());
     }
 
-    public RowMapper<OrderDetail> generateOrderDetailMapper() {
+    private RowMapper<OrdersDetail> generateOrderDetailMapper() {
         return (resultSet, rowNum) -> {
             Long id = resultSet.getLong("id");
             int quantity = resultSet.getInt("quantity");
@@ -77,7 +82,7 @@ public class OrdersDetailDao {
             boolean deleted = resultSet.getBoolean("productDeleted");
             Product product = new Product(productId, productName, productPrice, productImageUrl, deleted);
 
-            return new OrderDetail(id, orders, product, quantity);
+            return new OrdersDetail(id, orders, product, quantity);
         };
     }
 }

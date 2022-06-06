@@ -2,14 +2,22 @@ package woowacourse.shoppingcart.domain;
 
 import java.util.Objects;
 
-public class OrderDetail {
+public class OrdersDetail {
 
     private final Long id;
     private final Orders orders;
     private final Product product;
     private final int quantity;
 
-    public OrderDetail(Long id, Orders orders, Product product, int quantity) {
+    public OrdersDetail(Long id, OrdersDetail ordersDetail) {
+        this(id, ordersDetail.orders, ordersDetail.product, ordersDetail.quantity);
+    }
+
+    public OrdersDetail(Orders orders, Product product, int quantity) {
+        this(null, orders, product, quantity);
+    }
+
+    public OrdersDetail(Long id, Orders orders, Product product, int quantity) {
         this.id = id;
         this.orders = orders;
         this.product = product;
@@ -40,7 +48,7 @@ public class OrderDetail {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        OrderDetail that = (OrderDetail) o;
+        OrdersDetail that = (OrdersDetail) o;
         return Objects.equals(id, that.id);
     }
 

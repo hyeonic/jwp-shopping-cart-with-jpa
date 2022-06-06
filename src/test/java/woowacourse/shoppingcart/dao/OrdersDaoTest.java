@@ -19,13 +19,13 @@ import woowacourse.shoppingcart.domain.customer.Customer;
 @JdbcTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class OrderDaoTest {
+class OrdersDaoTest {
 
-    private final OrderDao orderDao;
+    private final OrdersDao ordersDao;
     private final CustomerDao customerDao;
 
-    public OrderDaoTest(JdbcTemplate jdbcTemplate) {
-        this.orderDao = new OrderDao(jdbcTemplate);
+    public OrdersDaoTest(JdbcTemplate jdbcTemplate) {
+        this.ordersDao = new OrdersDao(jdbcTemplate);
         this.customerDao = new CustomerDao(jdbcTemplate);
     }
 
@@ -34,7 +34,7 @@ class OrderDaoTest {
     void save() {
         Customer savedCustomer = customerDao.save(MAT);
 
-        Orders savedOrders = orderDao.save(new Orders(savedCustomer));
+        Orders savedOrders = ordersDao.save(new Orders(savedCustomer));
 
         assertThat(savedOrders.getCustomer()).isEqualTo(savedCustomer);
     }
@@ -43,9 +43,9 @@ class OrderDaoTest {
     @Test
     void findById() {
         Customer savedCustomer = customerDao.save(MAT);
-        Orders savedOrders = orderDao.save(new Orders(savedCustomer));
+        Orders savedOrders = ordersDao.save(new Orders(savedCustomer));
 
-        Orders foundOrders = orderDao.findById(savedOrders.getId()).get();
+        Orders foundOrders = ordersDao.findById(savedOrders.getId()).get();
 
         assertAll(() -> {
             assertThat(foundOrders).isEqualTo(savedOrders);
@@ -56,7 +56,7 @@ class OrderDaoTest {
     @DisplayName("존재하지 않는 id의 order인 경우 비어있다.")
     @Test
     void findById_error_notExistsOrders() {
-        Optional<Orders> orders = orderDao.findById(0L);
+        Optional<Orders> orders = ordersDao.findById(0L);
 
         assertThat(orders).isEmpty();
     }
@@ -65,10 +65,10 @@ class OrderDaoTest {
     @Test
     void findByCustomerId() {
         Customer savedCustomer = customerDao.save(MAT);
-        orderDao.save(new Orders(savedCustomer));
-        orderDao.save(new Orders(savedCustomer));
+        ordersDao.save(new Orders(savedCustomer));
+        ordersDao.save(new Orders(savedCustomer));
 
-        List<Orders> orders = orderDao.findByCustomerId(savedCustomer.getId());
+        List<Orders> orders = ordersDao.findByCustomerId(savedCustomer.getId());
 
         assertThat(orders).hasSize(2);
     }
@@ -77,9 +77,9 @@ class OrderDaoTest {
     @Test
     void existsByIdAndCustomerId() {
         Customer savedCustomer = customerDao.save(MAT);
-        Orders savedOrders = orderDao.save(new Orders(savedCustomer));
+        Orders savedOrders = ordersDao.save(new Orders(savedCustomer));
 
-        boolean result = orderDao.existsByIdAndCustomerId(savedOrders.getId(), savedCustomer.getId());
+        boolean result = ordersDao.existsByIdAndCustomerId(savedOrders.getId(), savedCustomer.getId());
 
         assertThat(result).isTrue();
     }

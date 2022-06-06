@@ -14,7 +14,7 @@ import woowacourse.shoppingcart.domain.Orders;
 import woowacourse.shoppingcart.domain.customer.Customer;
 
 @Repository
-public class OrderDao {
+public class OrdersDao {
 
     private static final String TABLE_NAME = "orders";
     private static final String KEY_NAME = "id";
@@ -22,7 +22,7 @@ public class OrderDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
-    public OrderDao(JdbcTemplate jdbcTemplate) {
+    public OrdersDao(JdbcTemplate jdbcTemplate) {
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(TABLE_NAME)
