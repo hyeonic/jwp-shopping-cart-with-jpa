@@ -1,50 +1,51 @@
 package woowacourse.shoppingcart.domain;
 
+import java.util.Objects;
+
 public class OrderDetail {
-    private Long productId;
-    private int quantity;
-    private int price;
-    private String name;
-    private String imageUrl;
 
-    public OrderDetail() {
-    }
+    private final Long id;
+    private final Orders orders;
+    private final Product product;
+    private final int quantity;
 
-    public OrderDetail(final Long productId, final int quantity) {
-        this.productId = productId;
+    public OrderDetail(Long id, Orders orders, Product product, int quantity) {
+        this.id = id;
+        this.orders = orders;
+        this.product = product;
         this.quantity = quantity;
     }
 
-    public OrderDetail(final Product product, final int quantity) {
-        this(product.getId(), product.getPrice(), product.getName(), product.getImageUrl(), quantity);
+    public Long getId() {
+        return id;
     }
 
-    public OrderDetail(final Long productId, final int price, final String name,
-                       final String imageUrl, final int quantity) {
-        this.productId = productId;
-        this.price = price;
-        this.name = name;
-        this.imageUrl = imageUrl;
-        this.quantity = quantity;
+    public Orders getOrders() {
+        return orders;
     }
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
+    public Product getProduct() {
+        return product;
     }
 
     public int getQuantity() {
         return quantity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OrderDetail that = (OrderDetail) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
