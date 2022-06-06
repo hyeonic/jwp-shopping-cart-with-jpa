@@ -49,8 +49,10 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler({
-            NoSuchCustomerException.class,
+            NoSuchOrdersException.class,
             NoSuchProductException.class,
+            NoSuchCustomerException.class,
+            NoSuchCartItemException.class,
             NotInCustomerCartItemException.class,
     })
     public ResponseEntity<ErrorResponse> handleNoSuchException(RuntimeException e) {
