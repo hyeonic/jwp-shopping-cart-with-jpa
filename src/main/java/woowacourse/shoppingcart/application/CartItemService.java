@@ -19,17 +19,17 @@ import woowacourse.shoppingcart.exception.NotInCustomerCartItemException;
 @Transactional(readOnly = true)
 public class CartItemService {
 
-    private final CartItemDao cartItemDao;
     private final ProductDao productDao;
+    private final CartItemDao cartItemDao;
     private final CustomerService customerService;
 
-    public CartItemService(CartItemDao cartItemDao, ProductDao productDao, CustomerService customerService) {
-        this.cartItemDao = cartItemDao;
+    public CartItemService(ProductDao productDao, CartItemDao cartItemDao, CustomerService customerService) {
         this.productDao = productDao;
+        this.cartItemDao = cartItemDao;
         this.customerService = customerService;
     }
 
-    public List<CartItemResponse> findByCustomerId(String username) {
+    public List<CartItemResponse> findByCustomerUsername(String username) {
         Customer customer = customerService.findByUsername(username);
         return cartItemDao.findByCustomerId(customer.getId())
                 .stream()
@@ -38,22 +38,17 @@ public class CartItemService {
     }
 
     @Transactional
-    public Long save(String username, CartItemSaveRequest request) {
+    public CartItemResponse save(String username, CartItemSaveRequest request) {
         Customer customer = customerService.findByUsername(username);
         Product product = getProduct(request);
-        return cartItemDao.save(new CartItem(customer, product, request.getQuantity())).getId();
+        CartItem cartItem = cartItemDao.save(new CartItem(customer, product, request.getQuantity()));
+        return new CartItemResponse(cartItem);
     }
 
     @Transactional
     public void delete(String username, Long cartId) {
         Customer customer = customerService.findByUsername(username);
-
-        List<Long> cartItemIds = cartItemDao.findByCustomerId(customer.getId())
-                .stream()
-                .map(CartItem::getId)
-                .collect(toList());
-
-        if (!cartItemIds.contains(cartId)) {
+        if (!cartItemDao.existsByIdAndCustomerId(cartId, customer.getId())) {
             throw new NotInCustomerCartItemException();
         }
 

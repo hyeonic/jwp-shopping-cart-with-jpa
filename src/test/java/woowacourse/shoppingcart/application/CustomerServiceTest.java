@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.context.jdbc.Sql;
+import woowacourse.shoppingcart.domain.customer.Customer;
 import woowacourse.shoppingcart.dto.customer.CustomerResponse;
 import woowacourse.shoppingcart.dto.customer.CustomerSaveRequest;
 import woowacourse.shoppingcart.dto.customer.LoginCustomer;
@@ -76,8 +77,31 @@ class CustomerServiceTest {
 
     @DisplayName("존재하지 않는 username인 경우 예외를 던진다.")
     @Test
-    void find_error_notExist_username() {
+    void findByUsername_error_notExist_username() {
         assertThatThrownBy(() -> customerService.find(new LoginCustomer("merong")))
+                .isInstanceOf(NoSuchCustomerException.class);
+    }
+
+    @DisplayName("customer의 username을 활용하여 조회한다.")
+    @Test
+    void findByUsername() {
+        customerService.save(YAHO_SAVE_REQUEST);
+
+        Customer foundCustomer = customerService.findByUsername(YAHO_USERNAME);
+
+        assertAll(() -> {
+            assertThat(foundCustomer.getId()).isNotNull();
+            assertThat(foundCustomer.getUsername()).isEqualTo(YAHO_USERNAME);
+            assertThat(foundCustomer.getEmail()).isEqualTo(YAHO_EMAIL);
+            assertThat(foundCustomer.getAddress()).isEqualTo(YAHO_ADDRESS);
+            assertThat(foundCustomer.getPhoneNumber()).isEqualTo(YAHO_PHONE_NUMBER);
+        });
+    }
+
+    @DisplayName("존재하지 않는 username인 경우 예외를 던진다.")
+    @Test
+    void find_error_notExist_username() {
+        assertThatThrownBy(() -> customerService.findByUsername("merong"))
                 .isInstanceOf(NoSuchCustomerException.class);
     }
 
