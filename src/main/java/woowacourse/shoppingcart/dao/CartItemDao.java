@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import woowacourse.shoppingcart.domain.CartItem;
 import woowacourse.shoppingcart.domain.Product;
@@ -17,27 +16,43 @@ import woowacourse.shoppingcart.domain.customer.Customer;
 @Repository
 public class CartItemDao {
 
-    private static final String TABLE_NAME = "cart_item";
-    private static final String KEY_NAME = "id";
-
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert simpleJdbcInsert;
 
     public CartItemDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-        this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName(TABLE_NAME)
-                .usingGeneratedKeyColumns(KEY_NAME);
     }
 
     public CartItem save(CartItem cartItem) {
+        String sql = "INSERT INTO cart_item(customer_id, product_id, quantity) "
+                + "VALUES(:customerId, :productId, :quantity) "
+                + "ON DUPLICATE KEY UPDATE quantity = quantity + :quantity";
+
         SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue("customer_id", cartItem.getCustomer().getId())
-                .addValue("product_id", cartItem.getProduct().getId())
+                .addValue("customerId", cartItem.getCustomer().getId())
+                .addValue("productId", cartItem.getProduct().getId())
                 .addValue("quantity", cartItem.getQuantity());
 
-        Long id = simpleJdbcInsert.executeAndReturnKey(parameterSource).longValue();
-        return new CartItem(id, cartItem);
+        jdbcTemplate.update(sql, parameterSource);
+        return findByCustomerIdAndProductId(cartItem);
+    }
+
+    private CartItem findByCustomerIdAndProductId(CartItem cartItem) {
+        String sql = "SELECT ci.id as id, ci.quantity as quantity, "
+                + "c.id as customerId, c.username as customerUsername, c.email as customerEmail, "
+                + "c.password as customerPassword, c.address as customerAddress, "
+                + "c.phone_number as customerPhoneNumber, "
+                + "p.id as productId, p.name as productName, p.price as productPrice, "
+                + "p.image_url as productImageUrl, p.deleted as productDeleted "
+                + "FROM cart_item ci "
+                + "JOIN customer c ON ci.customer_id = c.id "
+                + "JOIN product p ON ci.product_id = p.id "
+                + "WHERE ci.customer_id = :customerId AND ci.product_id = :productId ";
+
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("customerId", cartItem.getCustomer().getId())
+                .addValue("productId", cartItem.getProduct().getId());
+
+        return jdbcTemplate.queryForObject(sql, parameterSource, generateCartItemMapper());
     }
 
     public List<CartItem> findByCustomerId(Long customerId) {

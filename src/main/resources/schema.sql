@@ -52,6 +52,8 @@ alter table cart_item
     add constraint fk_cart_item_to_product
         foreign key (product_id) references product (id);
 
+alter table cart_item add unique (customer_id, product_id);
+
 create table orders
 (
     id          bigint not null auto_increment,

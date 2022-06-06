@@ -48,6 +48,23 @@ public class CartItemDaoTest {
         });
     }
 
+    @DisplayName("중복된 물품을 담으면, 기존 수량에 더해서 담긴 카트 아이템을 반환한다.")
+    @Test
+    void save_duplicated() {
+        Customer savedCustomer = customerDao.save(MAT);
+        Product savedProduct = productDao.save(ONE_PRODUCT);
+        CartItem cartItem = new CartItem(savedCustomer, savedProduct, 10);
+
+        cartItemDao.save(cartItem);
+        CartItem savedCartItem = cartItemDao.save(cartItem);
+
+        assertAll(() -> {
+            assertThat(savedCartItem.getCustomer()).isEqualTo(savedCustomer);
+            assertThat(savedCartItem.getProduct()).isEqualTo(savedProduct);
+            assertThat(savedCartItem.getQuantity()).isEqualTo(20);
+        });
+    }
+
     @DisplayName("customer의 id를 가진 cartItem 리스트를 반환한다.")
     @Test
     void findByCustomerId() {
