@@ -19,11 +19,11 @@ public class OrdersDao {
     private static final String TABLE_NAME = "orders";
     private static final String KEY_NAME = "id";
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
     public OrdersDao(JdbcTemplate jdbcTemplate) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns(KEY_NAME);
@@ -49,7 +49,7 @@ public class OrdersDao {
 
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
             return Optional.ofNullable(
-                    namedParameterJdbcTemplate.queryForObject(sql, parameterSource, generateOrdersMapper()));
+                    jdbcTemplate.queryForObject(sql, parameterSource, generateOrdersMapper()));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
@@ -65,7 +65,7 @@ public class OrdersDao {
                 + "WHERE o.customer_id = :customerId";
 
         SqlParameterSource parameterSource = new MapSqlParameterSource("customerId", customerId);
-        return namedParameterJdbcTemplate.query(sql, parameterSource, generateOrdersMapper());
+        return jdbcTemplate.query(sql, parameterSource, generateOrdersMapper());
     }
 
     public RowMapper<Orders> generateOrdersMapper() {
@@ -90,6 +90,6 @@ public class OrdersDao {
         SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue("id", id)
                 .addValue("customerId", customerId);
-        return namedParameterJdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
     }
 }

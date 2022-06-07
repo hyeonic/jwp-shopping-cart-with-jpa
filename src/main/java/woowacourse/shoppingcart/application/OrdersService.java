@@ -16,6 +16,7 @@ import woowacourse.shoppingcart.dto.orders.OrdersDetailRequest;
 import woowacourse.shoppingcart.dto.orders.OrdersDetailResponse;
 import woowacourse.shoppingcart.dto.orders.OrdersResponse;
 import woowacourse.shoppingcart.exception.NoSuchCartItemException;
+import woowacourse.shoppingcart.exception.NoSuchOrdersException;
 
 @Service
 @Transactional(readOnly = true)
@@ -57,5 +58,37 @@ public class OrdersService {
     private CartItem getCartItem(Long cartId) {
         return cartItemDao.findById(cartId)
                 .orElseThrow(NoSuchCartItemException::new);
+    }
+
+    public OrdersResponse findById(Long id) {
+        Orders orders = getOrders(id);
+        List<OrdersDetailResponse> ordersDetails = ordersDetailDao.findByOrdersId(orders.getId())
+                .stream()
+                .map(OrdersDetailResponse::new)
+                .collect(toList());
+
+        return new OrdersResponse(orders.getId(), ordersDetails);
+    }
+
+    public List<OrdersResponse> findByCustomerUsername(String username) {
+        Customer customer = customerService.findByUsername(username);
+        return ordersDao.findByCustomerId(customer.getId())
+                .stream()
+                .map(this::getOrdersResponse)
+                .collect(toList());
+    }
+
+    private Orders getOrders(Long id) {
+        return ordersDao.findById(id)
+                .orElseThrow(NoSuchOrdersException::new);
+    }
+
+    private OrdersResponse getOrdersResponse(Orders orders) {
+        List<OrdersDetailResponse> ordersDetails = ordersDetailDao.findByOrdersId(orders.getId())
+                .stream()
+                .map(OrdersDetailResponse::new)
+                .collect(toList());
+
+        return new OrdersResponse(orders.getId(), ordersDetails);
     }
 }
