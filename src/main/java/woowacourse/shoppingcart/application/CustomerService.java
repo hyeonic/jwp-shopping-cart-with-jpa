@@ -8,6 +8,7 @@ import woowacourse.shoppingcart.dto.customer.CustomerResponse;
 import woowacourse.shoppingcart.dto.customer.CustomerSaveRequest;
 import woowacourse.shoppingcart.dto.customer.CustomerUpdateRequest;
 import woowacourse.shoppingcart.dto.customer.LoginCustomer;
+import woowacourse.shoppingcart.exception.DuplicatedUsernameException;
 import woowacourse.shoppingcart.exception.InvalidCustomerException;
 import woowacourse.shoppingcart.exception.NoSuchCustomerException;
 
@@ -39,6 +40,18 @@ public class CustomerService {
     public void validateUsernameAndPassword(String username, String password) {
         if (!customerDao.existsByUsernameAndPassword(username, password)) {
             throw new InvalidCustomerException();
+        }
+    }
+
+    public void validateUsername(String username) {
+        if (!customerDao.existsByUsername(username)) {
+            throw new DuplicatedUsernameException();
+        }
+    }
+
+    public void validateEmail(String email) {
+        if (!customerDao.existsByEmail(email)) {
+            throw new DuplicatedUsernameException();
         }
     }
 

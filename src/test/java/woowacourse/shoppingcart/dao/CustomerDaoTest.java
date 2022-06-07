@@ -90,10 +90,46 @@ public class CustomerDaoTest {
         assertThat(result).isTrue();
     }
 
-    @DisplayName("존재하지 않는 username이거나 password인 경우 예외를 던진다.")
+    @DisplayName("존재하지 않는 username이거나 password인 경우 false를 반환한다.")
     @Test
-    void existsCustomer_error_notExists() {
+    void existsCustomer_notExists() {
         boolean result = customerDao.existsByUsernameAndPassword(MAT_USERNAME, MAT_PASSWORD);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("존재하는 username인 경우 true를 반환한다.")
+    @Test
+    void existsByUsername() {
+        customerDao.save(MAT);
+
+        boolean result = customerDao.existsByUsername(MAT_USERNAME);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("존재하지 않는 username인 경우 false를 반환한다.")
+    @Test
+    void existsByUsername_notExists() {
+        boolean result = customerDao.existsByUsername(MAT_USERNAME);
+
+        assertThat(result).isFalse();
+    }
+
+    @DisplayName("존재하는 email인 경우 true를 반환한다.")
+    @Test
+    void existsByEmail() {
+        customerDao.save(MAT);
+
+        boolean result = customerDao.existsByEmail(MAT_EMAIL);
+
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("존재하지 않는 email인 경우 false를 반환한다.")
+    @Test
+    void existsByEmail_notExists() {
+        boolean result = customerDao.existsByEmail(MAT_EMAIL);
 
         assertThat(result).isFalse();
     }

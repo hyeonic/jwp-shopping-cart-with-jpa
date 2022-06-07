@@ -60,15 +60,6 @@ public class CustomerDao {
         }
     }
 
-    public boolean existsByUsernameAndPassword(String username, String password) {
-        String sql = "SELECT EXISTS (SELECT 1 FROM customer WHERE username = :username AND password = :password)";
-        SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue("username", username)
-                .addValue("password", password);
-
-        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
-    }
-
     private RowMapper<Customer> generateCustomerMapper() {
         return (resultSet, rowNum) ->
                 new Customer(
@@ -79,6 +70,27 @@ public class CustomerDao {
                         resultSet.getString("address"),
                         resultSet.getString("phone_number")
                 );
+    }
+
+    public boolean existsByUsernameAndPassword(String username, String password) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM customer WHERE username = :username AND password = :password)";
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("username", username)
+                .addValue("password", password);
+
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
+    }
+
+    public boolean existsByUsername(String username) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM customer WHERE username = :username)";
+        SqlParameterSource parameterSource = new MapSqlParameterSource("username", username);
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
+    }
+
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM customer WHERE email = :email)";
+        SqlParameterSource parameterSource = new MapSqlParameterSource("email", email);
+        return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
     }
 
     public void update(Customer customer) {
