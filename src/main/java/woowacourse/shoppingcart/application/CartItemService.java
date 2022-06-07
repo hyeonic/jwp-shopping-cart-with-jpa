@@ -47,10 +47,15 @@ public class CartItemService {
         return new CartItemResponse(cartItem);
     }
 
+    public CartItemResponse findById(Long id) {
+        CartItem cartItem = cartItemDao.findById(id)
+                .orElseThrow(NoSuchCartItemException::new);
+        return new CartItemResponse(cartItem);
+    }
+
     @Transactional
     public void update(Long cartItemId, CartItemUpdateRequest request) {
-        CartItem cartItem = getCartItem(cartItemId);
-        cartItemDao.save(new CartItem(cartItem.getCustomer(), cartItem.getProduct(), request.getQuantity()));
+        cartItemDao.update(cartItemId, request.getQuantity());
     }
 
     @Transactional
@@ -66,10 +71,5 @@ public class CartItemService {
     private Product getProduct(Long productId) {
         return productDao.findById(productId)
                 .orElseThrow(NoSuchProductException::new);
-    }
-
-    private CartItem getCartItem(Long cartItemId) {
-        return cartItemDao.findById(cartItemId)
-                .orElseThrow(NoSuchCartItemException::new);
     }
 }

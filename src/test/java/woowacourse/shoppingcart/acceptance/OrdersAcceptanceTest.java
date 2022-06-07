@@ -90,11 +90,11 @@ public class OrdersAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(token)
                 .body(cartItemSaveRequest)
-                .when().post("/api/customers/me/cartItems")
+                .when().post("/api/customers/me/cart-items")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
 
-        return Long.parseLong(response.header("Location").split("/cartItems/")[1]);
+        return Long.parseLong(response.header("Location").split("/cart-items/")[1]);
     }
 }

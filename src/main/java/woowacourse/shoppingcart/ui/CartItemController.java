@@ -35,6 +35,13 @@ public class CartItemController {
         return ResponseEntity.ok().body(cartItemService.findByCustomerUsername(loginCustomer.getUsername()));
     }
 
+    @GetMapping("/{cartId}")
+    public ResponseEntity<CartItemResponse> getCartItem(@AuthenticationPrincipal LoginCustomer loginCustomer,
+                                                              @PathVariable Long cartId) {
+        CartItemResponse cartItemResponse = cartItemService.findById(cartId);
+        return ResponseEntity.ok().body(cartItemResponse);
+    }
+
     @PostMapping
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginCustomer loginCustomer,
                                      @Valid @RequestBody CartItemSaveRequest request) {

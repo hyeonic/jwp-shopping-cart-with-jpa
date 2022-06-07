@@ -9,13 +9,16 @@ import static woowacourse.shoppingcart.ProductFixtures.TWO_PRODUCT_SAVE_REQUEST;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import woowacourse.auth.dto.TokenRequest;
 import woowacourse.auth.dto.TokenResponse;
+import woowacourse.shoppingcart.dto.cartitem.CartItemResponse;
 import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
+import woowacourse.shoppingcart.dto.cartitem.CartItemUpdateRequest;
 import woowacourse.shoppingcart.dto.customer.CustomerSaveRequest;
 import woowacourse.shoppingcart.dto.product.ProductSaveRequest;
 
@@ -66,11 +69,46 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessToken)
-                .when()
+                .when().log().all()
                 .delete("/api/customers/me/cart-items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
+    }
+
+    @DisplayName("장바구니의 수량을 증가 시킨다.")
+    @Test
+    void updateQuantity() {
+        generateCustomer(MAT_SAVE_REQUEST);
+        String accessToken = generateToken(new TokenRequest(MAT_USERNAME, MAT_PASSWORD));
+
+        Long productId = generateProduct(ONE_PRODUCT_SAVE_REQUEST);
+        Long cartItemId = generateCartItem(accessToken, new CartItemSaveRequest(productId, 2));
+
+        RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(accessToken)
+                .body(new CartItemUpdateRequest(10))
+                .when().log().all()
+                .patch("/api/customers/me/cart-items/{cartItemId}", cartItemId)
+                .then().log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .extract();
+
+        CartItemResponse response = findCartItem(accessToken, cartItemId);
+        Assertions.assertThat(response.getQuantity()).isEqualTo(10);
+    }
+
+    private CartItemResponse findCartItem(String accessToken, Long cartItemId) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(accessToken)
+                .when().log().all()
+                .get("/api/customers/me/cart-items/{cartItemId}", cartItemId)
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CartItemResponse.class);
     }
 
     private void generateCustomer(CustomerSaveRequest request) {
@@ -115,6 +153,6 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
 
-        return Long.parseLong(response.header("Location").split("/cartItems/")[1]);
+        return Long.parseLong(response.header("Location").split("/cart-items/")[1]);
     }
 }

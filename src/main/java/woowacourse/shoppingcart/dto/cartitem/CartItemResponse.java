@@ -5,9 +5,12 @@ import woowacourse.shoppingcart.dto.product.ProductResponse;
 
 public class CartItemResponse {
 
-    private final Long id;
-    private final int quantity;
-    private final ProductResponse product;
+    private Long id;
+    private int quantity;
+    private ProductResponse product;
+
+    private CartItemResponse() {
+    }
 
     public CartItemResponse(CartItem cartItem) {
         this.id = cartItem.getId();

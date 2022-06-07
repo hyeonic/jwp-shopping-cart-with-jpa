@@ -125,6 +125,15 @@ public class CartItemDao {
         return jdbcTemplate.queryForObject(sql, parameterSource, Boolean.class);
     }
 
+    public void update(Long id, int quantity) {
+        String sql = "UPDATE cart_item SET quantity = :quantity WHERE id = :id";
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("quantity", quantity)
+                .addValue("id", id);
+
+        jdbcTemplate.update(sql, parameterSource);
+    }
+
     public void deleteById(Long id) {
         String sql = "DELETE FROM cart_item WHERE id = :id";
         SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
