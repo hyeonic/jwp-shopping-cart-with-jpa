@@ -30,7 +30,7 @@ create table product
     id          bigint       not null auto_increment,
     name        varchar(255) not null,
     price       integer      not null,
-    image_url   varchar(255) not null,
+    image_url   varchar(1024) not null,
     description varchar(255) not null,
     deleted     boolean not null,
     primary key (id)
