@@ -4,7 +4,11 @@ public class CustomerEmailDuplicatedRequest {
 
     private String email;
 
-    public CustomerEmailDuplicatedRequest() {
+    private CustomerEmailDuplicatedRequest() {
+    }
+
+    public CustomerEmailDuplicatedRequest(String email) {
+        this.email = email;
     }
 
     public String getEmail() {

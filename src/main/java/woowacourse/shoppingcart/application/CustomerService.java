@@ -43,11 +43,11 @@ public class CustomerService {
     }
 
     public boolean isDuplicatedUsername(String username) {
-        return !customerDao.existsByUsername(username);
+        return customerDao.existsByUsername(username);
     }
 
     public boolean isDuplicatedEmail(String email) {
-        return !customerDao.existsByEmail(email);
+        return customerDao.existsByEmail(email);
     }
 
     @Transactional

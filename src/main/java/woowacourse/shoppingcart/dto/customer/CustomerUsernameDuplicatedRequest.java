@@ -7,6 +7,10 @@ public class CustomerUsernameDuplicatedRequest {
     private CustomerUsernameDuplicatedRequest() {
     }
 
+    public CustomerUsernameDuplicatedRequest(String username) {
+        this.username = username;
+    }
+
     public String getUsername() {
         return username;
     }

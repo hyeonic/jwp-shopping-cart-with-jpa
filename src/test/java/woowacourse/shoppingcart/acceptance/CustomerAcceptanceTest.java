@@ -25,8 +25,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import woowacourse.auth.dto.TokenRequest;
 import woowacourse.auth.dto.TokenResponse;
+import woowacourse.shoppingcart.dto.customer.CustomerEmailDuplicatedRequest;
+import woowacourse.shoppingcart.dto.customer.CustomerEmailDuplicatedResponse;
 import woowacourse.shoppingcart.dto.customer.CustomerResponse;
 import woowacourse.shoppingcart.dto.customer.CustomerSaveRequest;
+import woowacourse.shoppingcart.dto.customer.CustomerUsernameDuplicatedRequest;
+import woowacourse.shoppingcart.dto.customer.CustomerUsernameDuplicatedResponse;
 
 @DisplayName("회원 관련 기능")
 public class CustomerAcceptanceTest extends AcceptanceTest {
@@ -139,6 +143,82 @@ public class CustomerAcceptanceTest extends AcceptanceTest {
                 .then().log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .extract();
+    }
+
+    @DisplayName("username의 중복 여부를 확인한다.")
+    @Test
+    void duplicatedUsername() {
+        CustomerUsernameDuplicatedResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new CustomerUsernameDuplicatedRequest("mat"))
+                .when().post("/api/customers/duplication/username")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CustomerUsernameDuplicatedResponse.class);
+
+        assertAll(() -> {
+            assertThat(response.getUsername()).isEqualTo("mat");
+            assertThat(response.isDuplicated()).isFalse();
+        });
+    }
+
+    @DisplayName("username이 중복된 경우 true를 반환한다.")
+    @Test
+    void duplicatedUsername_duplicated() {
+        generateCustomer(MAT_SAVE_REQUEST);
+
+        CustomerUsernameDuplicatedResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new CustomerUsernameDuplicatedRequest(MAT_USERNAME))
+                .when().post("/api/customers/duplication/username")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CustomerUsernameDuplicatedResponse.class);
+
+        assertAll(() -> {
+            assertThat(response.getUsername()).isEqualTo(MAT_USERNAME);
+            assertThat(response.isDuplicated()).isTrue();
+        });
+    }
+
+    @DisplayName("email의 중복 여부를 확인한다.")
+    @Test
+    void duplicatedEmail() {
+        CustomerEmailDuplicatedResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new CustomerEmailDuplicatedRequest(MAT_EMAIL))
+                .when().post("/api/customers/duplication/email")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CustomerEmailDuplicatedResponse.class);
+
+        assertAll(() -> {
+            assertThat(response.getEmail()).isEqualTo(MAT_EMAIL);
+            assertThat(response.isDuplicated()).isFalse();
+        });
+    }
+
+    @DisplayName("email이 중복된 경우 true를 반환한다.")
+    @Test
+    void duplicatedEmail_duplicated() {
+        generateCustomer(MAT_SAVE_REQUEST);
+
+        CustomerEmailDuplicatedResponse response = RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new CustomerEmailDuplicatedRequest(MAT_EMAIL))
+                .when().post("/api/customers/duplication/email")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .as(CustomerEmailDuplicatedResponse.class);
+
+        assertAll(() -> {
+            assertThat(response.getEmail()).isEqualTo(MAT_EMAIL);
+            assertThat(response.isDuplicated()).isTrue();
+        });
     }
 
     private void generateCustomer(CustomerSaveRequest request) {

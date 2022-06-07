@@ -63,7 +63,7 @@ public class CustomerController {
         return ResponseEntity.ok(new CustomerUsernameDuplicatedResponse(request.getUsername(), duplicatedUsername));
     }
 
-    @PostMapping("/duplication/username")
+    @PostMapping("/duplication/email")
     public ResponseEntity<CustomerEmailDuplicatedResponse> duplicatedEmail(
             @RequestBody CustomerEmailDuplicatedRequest request) {
         boolean duplicatedEmail = customerService.isDuplicatedEmail(request.getEmail());
