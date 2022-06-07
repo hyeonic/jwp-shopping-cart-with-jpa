@@ -8,16 +8,18 @@ public class ProductResponse {
     private final String name;
     private final int price;
     private final String imageUrl;
+    private final String description;
 
     public ProductResponse(Product product) {
-        this(product.getId(), product.getName(), product.getPrice(), product.getImageUrl());
+        this(product.getId(), product.getName(), product.getPrice(), product.getImageUrl(), product.getDescription());
     }
 
-    public ProductResponse(Long id, String name, int price, String imageUrl) {
+    public ProductResponse(Long id, String name, int price, String imageUrl, String description) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.description = description;
     }
 
     public Long getId() {
@@ -34,5 +36,9 @@ public class ProductResponse {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

@@ -42,7 +42,7 @@ public class CartItemDao {
                 + "c.password as customerPassword, c.address as customerAddress, "
                 + "c.phone_number as customerPhoneNumber, "
                 + "p.id as productId, p.name as productName, p.price as productPrice, "
-                + "p.image_url as productImageUrl, p.deleted as productDeleted "
+                + "p.image_url as productImageUrl, p.description as productDescription, p.deleted as productDeleted "
                 + "FROM cart_item ci "
                 + "JOIN customer c ON ci.customer_id = c.id "
                 + "JOIN product p ON ci.product_id = p.id "
@@ -61,7 +61,7 @@ public class CartItemDao {
                 + "c.password as customerPassword, c.address as customerAddress, "
                 + "c.phone_number as customerPhoneNumber, "
                 + "p.id as productId, p.name as productName, p.price as productPrice, "
-                + "p.image_url as productImageUrl, p.deleted as productDeleted "
+                + "p.image_url as productImageUrl, p.description as productDescription, p.deleted as productDeleted "
                 + "FROM cart_item ci "
                 + "JOIN customer c ON ci.customer_id = c.id "
                 + "JOIN product p ON ci.product_id = p.id "
@@ -78,7 +78,8 @@ public class CartItemDao {
                     + "c.password as customerPassword, c.address as customerAddress, "
                     + "c.phone_number as customerPhoneNumber, "
                     + "p.id as productId, p.name as productName, p.price as productPrice, "
-                    + "p.image_url as productImageUrl, p.deleted as productDeleted "
+                    + "p.image_url as productImageUrl, p.description as productDescription, "
+                    + "p.deleted as productDeleted "
                     + "FROM cart_item ci "
                     + "JOIN customer c ON ci.customer_id = c.id "
                     + "JOIN product p ON ci.product_id = p.id "
@@ -109,8 +110,11 @@ public class CartItemDao {
             String productName = resultSet.getString("productName");
             int productPrice = resultSet.getInt("productPrice");
             String productImageUrl = resultSet.getString("productImageUrl");
+            String productDescription = resultSet.getString("productDescription");
+
             boolean productDeleted = resultSet.getBoolean("productDeleted");
-            Product product = new Product(productId, productName, productPrice, productImageUrl, productDeleted);
+            Product product = new Product(
+                    productId, productName, productPrice, productImageUrl, productDescription, productDeleted);
 
             return new CartItem(id, customer, product, quantity);
         };

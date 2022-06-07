@@ -8,24 +8,26 @@ public class Product {
     private String name;
     private Integer price;
     private String imageUrl;
+    private String description;
     private boolean deleted;
 
     private Product() {
     }
 
     public Product(Long id, Product product) {
-        this(id, product.getName(), product.getPrice(), product.getImageUrl(), product.isDeleted());
+        this(id, product.name, product.price, product.imageUrl, product.description, product.deleted);
     }
 
-    public Product(String name, int price, String imageUrl) {
-        this(null, name, price, imageUrl, false);
+    public Product(String name, int price, String imageUrl, String description) {
+        this(null, name, price, imageUrl, description, false);
     }
 
-    public Product(Long id, String name, int price, String imageUrl, boolean deleted) {
+    public Product(Long id, String name, int price, String imageUrl, String description, boolean deleted) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.description = description;
         this.deleted = deleted;
     }
 
@@ -43,6 +45,10 @@ public class Product {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public boolean isDeleted() {

@@ -47,7 +47,7 @@ public class OrdersDetailDao {
                 + "c.password as customerPassword, c.address as customerAddress, "
                 + "c.phone_number as customerPhoneNumber, "
                 + "p.id as productId, p.name as productName, p.price as productPrice, "
-                + "p.image_url as productImageUrl, p.deleted as productDeleted "
+                + "p.image_url as productImageUrl, p.description as productDescription, p.deleted as productDeleted "
                 + "FROM orders_detail od "
                 + "JOIN orders o ON od.orders_id = o.id "
                 + "JOIN product p ON od.product_id = p.id "
@@ -79,8 +79,10 @@ public class OrdersDetailDao {
             String productName = resultSet.getString("productName");
             int productPrice = resultSet.getInt("productPrice");
             String productImageUrl = resultSet.getString("productImageUrl");
+            String productDescription = resultSet.getString("productDescription");
             boolean deleted = resultSet.getBoolean("productDeleted");
-            Product product = new Product(productId, productName, productPrice, productImageUrl, deleted);
+            Product product = new Product(
+                    productId, productName, productPrice, productImageUrl, productDescription, deleted);
 
             return new OrdersDetail(id, orders, product, quantity);
         };

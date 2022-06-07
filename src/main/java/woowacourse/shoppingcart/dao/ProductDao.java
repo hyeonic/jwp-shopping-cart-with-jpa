@@ -37,7 +37,7 @@ public class ProductDao {
 
     public Optional<Product> findById(Long id) {
         try {
-            String sql = "SELECT id, name, price, image_url, deleted FROM product WHERE id = :id";
+            String sql = "SELECT id, name, price, image_url, description, deleted FROM product WHERE id = :id";
             SqlParameterSource parameterSource = new MapSqlParameterSource("id", id);
             return Optional.ofNullable(
                     namedParameterJdbcTemplate.queryForObject(sql, parameterSource, generateProductMapper()));
@@ -47,7 +47,7 @@ public class ProductDao {
     }
 
     public List<Product> findAll() {
-        String sql = "SELECT id, name, price, image_url, deleted FROM product WHERE deleted = false";
+        String sql = "SELECT id, name, price, image_url, description, deleted FROM product WHERE deleted = false";
         return namedParameterJdbcTemplate.query(sql, generateProductMapper());
     }
 
@@ -57,6 +57,7 @@ public class ProductDao {
                 resultSet.getString("name"),
                 resultSet.getInt("price"),
                 resultSet.getString("image_url"),
+                resultSet.getString("description"),
                 resultSet.getBoolean("deleted")
         );
     }
