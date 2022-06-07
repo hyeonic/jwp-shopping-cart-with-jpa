@@ -18,7 +18,7 @@ import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
 import woowacourse.shoppingcart.dto.customer.LoginCustomer;
 
 @RestController
-@RequestMapping("/api/customers/me/cartItems")
+@RequestMapping("/api/customers/me/cart-items")
 public class CartItemController {
 
     private final CartItemService cartItemService;

@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import woowacourse.auth.dto.TokenRequest;
 import woowacourse.auth.dto.TokenResponse;
 import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
-import woowacourse.shoppingcart.dto.customer.CustomerResponse;
 import woowacourse.shoppingcart.dto.customer.CustomerSaveRequest;
 import woowacourse.shoppingcart.dto.product.ProductSaveRequest;
 
@@ -49,7 +48,7 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessToken)
-                .when().get("/api/customers/me/cartItems")
+                .when().get("/api/customers/me/cart-items")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -68,7 +67,7 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessToken)
                 .when()
-                .delete("/api/customers/me/cartItems/{cartItemId}", cartItemId)
+                .delete("/api/customers/me/cart-items/{cartItemId}", cartItemId)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
@@ -95,17 +94,6 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
                 .getAccessToken();
     }
 
-    private CustomerResponse findCustomer(String accessToken) {
-        return RestAssured.given().log().all()
-                .auth().oauth2(accessToken)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/api/customers/me")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .as(CustomerResponse.class);
-    }
-
     private Long generateProduct(ProductSaveRequest request) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -122,7 +110,7 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .auth().oauth2(accessToken)
                 .body(cartItemSaveRequest)
-                .when().post("/api/customers/me/cartItems")
+                .when().post("/api/customers/me/cart-items")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
