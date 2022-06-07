@@ -20,11 +20,11 @@ public class OrdersDetailDao {
     private static final String TABLE_NAME = "orders_detail";
     private static final String KEY_NAME = "id";
 
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
     public OrdersDetailDao(JdbcTemplate jdbcTemplate) {
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        this.jdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
         this.simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns(KEY_NAME);
@@ -55,7 +55,7 @@ public class OrdersDetailDao {
                 + "WHERE orders_id = :ordersId";
 
         SqlParameterSource parameterSource = new MapSqlParameterSource("ordersId", ordersId);
-        return namedParameterJdbcTemplate.query(sql, parameterSource, generateOrderDetailMapper());
+        return jdbcTemplate.query(sql, parameterSource, generateOrderDetailMapper());
     }
 
     private RowMapper<OrdersDetail> generateOrderDetailMapper() {
