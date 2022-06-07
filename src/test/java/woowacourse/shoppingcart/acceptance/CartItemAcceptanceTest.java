@@ -28,12 +28,11 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
     void addCartItem() {
         generateCustomer(MAT_SAVE_REQUEST);
         String accessToken = generateToken(new TokenRequest(MAT_USERNAME, MAT_PASSWORD));
-        CustomerResponse customerResponse = findCustomer(accessToken);
 
         Long productId = generateProduct(ONE_PRODUCT_SAVE_REQUEST);
 
         CartItemSaveRequest cartItemSaveRequest = new CartItemSaveRequest(productId, 2);
-        generateCartItem(customerResponse, cartItemSaveRequest);
+        generateCartItem(accessToken, cartItemSaveRequest);
     }
 
     @DisplayName("장바구니를 조회한다.")
@@ -41,16 +40,16 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
     void getCartItems() {
         generateCustomer(MAT_SAVE_REQUEST);
         String accessToken = generateToken(new TokenRequest(MAT_USERNAME, MAT_PASSWORD));
-        CustomerResponse customerResponse = findCustomer(accessToken);
 
         Long productId1 = generateProduct(ONE_PRODUCT_SAVE_REQUEST);
         Long productId2 = generateProduct(TWO_PRODUCT_SAVE_REQUEST);
-        generateCartItem(customerResponse, new CartItemSaveRequest(productId1, 2));
-        generateCartItem(customerResponse, new CartItemSaveRequest(productId2, 3));
+        generateCartItem(accessToken, new CartItemSaveRequest(productId1, 2));
+        generateCartItem(accessToken, new CartItemSaveRequest(productId2, 3));
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/api/customers/{customerName}/cartItems", customerResponse.getUsername())
+                .auth().oauth2(accessToken)
+                .when().get("/api/customers/me/cartItems")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value())
                 .extract();
@@ -61,18 +60,15 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
     void deleteCartItem() {
         generateCustomer(MAT_SAVE_REQUEST);
         String accessToken = generateToken(new TokenRequest(MAT_USERNAME, MAT_PASSWORD));
-        CustomerResponse customerResponse = findCustomer(accessToken);
 
         Long productId = generateProduct(ONE_PRODUCT_SAVE_REQUEST);
-        Long cartItemId = generateCartItem(customerResponse, new CartItemSaveRequest(productId, 2));
+        Long cartItemId = generateCartItem(accessToken, new CartItemSaveRequest(productId, 2));
 
         RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(accessToken)
                 .when()
-                .delete(
-                        "/api/customers/{customerName}/cartItems/{cartItemId}",
-                        customerResponse.getUsername(),
-                        cartItemId)
+                .delete("/api/customers/me/cartItems/{cartItemId}", cartItemId)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value())
                 .extract();
@@ -121,11 +117,12 @@ public class CartItemAcceptanceTest extends AcceptanceTest {
         return Long.parseLong(response.header("Location").split("/products/")[1]);
     }
 
-    private Long generateCartItem(CustomerResponse customerResponse, CartItemSaveRequest cartItemSaveRequest) {
+    private Long generateCartItem(String accessToken, CartItemSaveRequest cartItemSaveRequest) {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .auth().oauth2(accessToken)
                 .body(cartItemSaveRequest)
-                .when().post("/api/customers/{customerName}/cartItems", customerResponse.getUsername())
+                .when().post("/api/customers/me/cartItems")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .extract();
