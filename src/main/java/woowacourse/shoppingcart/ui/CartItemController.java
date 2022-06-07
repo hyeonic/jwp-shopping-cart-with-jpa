@@ -2,9 +2,11 @@ package woowacourse.shoppingcart.ui;
 
 import java.net.URI;
 import java.util.List;
+import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,6 +17,7 @@ import woowacourse.auth.support.AuthenticationPrincipal;
 import woowacourse.shoppingcart.application.CartItemService;
 import woowacourse.shoppingcart.dto.cartitem.CartItemResponse;
 import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
+import woowacourse.shoppingcart.dto.cartitem.CartItemUpdateRequest;
 import woowacourse.shoppingcart.dto.customer.LoginCustomer;
 
 @RestController
@@ -34,7 +37,7 @@ public class CartItemController {
 
     @PostMapping
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginCustomer loginCustomer,
-                                     @RequestBody CartItemSaveRequest request) {
+                                     @Valid @RequestBody CartItemSaveRequest request) {
         Long cartId = cartItemService.save(loginCustomer.getUsername(), request).getId();
         URI responseLocation = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -48,6 +51,14 @@ public class CartItemController {
     public ResponseEntity<Void> deleteCartItem(@AuthenticationPrincipal LoginCustomer loginCustomer,
                                                @PathVariable Long cartId) {
         cartItemService.delete(loginCustomer.getUsername(), cartId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{cartId}")
+    public ResponseEntity<Void> updateQuantity(@AuthenticationPrincipal LoginCustomer loginCustomer,
+                                               @PathVariable Long cartId,
+                                               @Valid @RequestBody CartItemUpdateRequest request) {
+        cartItemService.update(cartId, request);
         return ResponseEntity.noContent().build();
     }
 }

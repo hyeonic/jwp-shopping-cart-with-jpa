@@ -12,6 +12,8 @@ import woowacourse.shoppingcart.domain.Product;
 import woowacourse.shoppingcart.domain.customer.Customer;
 import woowacourse.shoppingcart.dto.cartitem.CartItemResponse;
 import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
+import woowacourse.shoppingcart.dto.cartitem.CartItemUpdateRequest;
+import woowacourse.shoppingcart.exception.NoSuchCartItemException;
 import woowacourse.shoppingcart.exception.NoSuchProductException;
 import woowacourse.shoppingcart.exception.NotInCustomerCartItemException;
 
@@ -40,9 +42,15 @@ public class CartItemService {
     @Transactional
     public CartItemResponse save(String username, CartItemSaveRequest request) {
         Customer customer = customerService.findByUsername(username);
-        Product product = getProduct(request);
+        Product product = getProduct(request.getProductId());
         CartItem cartItem = cartItemDao.save(new CartItem(customer, product, request.getQuantity()));
         return new CartItemResponse(cartItem);
+    }
+
+    @Transactional
+    public void update(Long cartItemId, CartItemUpdateRequest request) {
+        CartItem cartItem = getCartItem(cartItemId);
+        cartItemDao.save(new CartItem(cartItem.getCustomer(), cartItem.getProduct(), request.getQuantity()));
     }
 
     @Transactional
@@ -55,8 +63,13 @@ public class CartItemService {
         cartItemDao.deleteById(cartId);
     }
 
-    private Product getProduct(CartItemSaveRequest request) {
-        return productDao.findById(request.getProductId())
+    private Product getProduct(Long productId) {
+        return productDao.findById(productId)
                 .orElseThrow(NoSuchProductException::new);
+    }
+
+    private CartItem getCartItem(Long cartItemId) {
+        return cartItemDao.findById(cartItemId)
+                .orElseThrow(NoSuchCartItemException::new);
     }
 }
