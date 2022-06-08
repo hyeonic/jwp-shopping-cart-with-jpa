@@ -11,7 +11,7 @@ import woowacourse.shoppingcart.dto.customer.LoginCustomer;
 
 public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private static final String PAYLOAD_ATTRIBUTE_KEY = "payload";
+    private static final String ATTRIBUTE_PAYLOAD_KEY = "payload";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -22,7 +22,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
-        String payload = (String) httpServletRequest.getAttribute(PAYLOAD_ATTRIBUTE_KEY);
+        String payload = (String) httpServletRequest.getAttribute(ATTRIBUTE_PAYLOAD_KEY);
         return new LoginCustomer(payload);
     }
 }
