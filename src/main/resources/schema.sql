@@ -31,7 +31,7 @@ create table product
     name        varchar(255) not null,
     price       integer      not null,
     image_url   varchar(1024) not null,
-    description varchar(255) not null,
+    description varchar(255),
     deleted     boolean not null,
     primary key (id)
 ) engine=InnoDB default charset=utf8mb4;
