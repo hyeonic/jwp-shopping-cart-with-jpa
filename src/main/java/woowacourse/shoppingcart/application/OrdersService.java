@@ -41,7 +41,7 @@ public class OrdersService {
         Orders orders = ordersDao.save(new Orders(customer));
 
         for (OrdersDetailRequest orderDetail : orderDetailRequests) {
-            CartItem cartItem = getCartItem(orderDetail.getCartId());
+            CartItem cartItem = getCartItem(orderDetail.getCartItemId());
 
             ordersDetailDao.save(new OrdersDetail(orders, cartItem.getProduct(), orderDetail.getQuantity()));
             cartItemDao.deleteById(cartItem.getId());
