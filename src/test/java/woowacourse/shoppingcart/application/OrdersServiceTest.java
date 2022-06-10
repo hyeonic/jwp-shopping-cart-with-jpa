@@ -12,8 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.TestConstructor.AutowireMode;
 import org.springframework.test.context.jdbc.Sql;
-import woowacourse.shoppingcart.dao.CartItemDao;
-import woowacourse.shoppingcart.dao.OrdersDao;
 import woowacourse.shoppingcart.dto.cartitem.CartItemResponse;
 import woowacourse.shoppingcart.dto.cartitem.CartItemSaveRequest;
 import woowacourse.shoppingcart.dto.orders.OrdersDetailRequest;
@@ -25,18 +23,13 @@ import woowacourse.shoppingcart.dto.product.ProductResponse;
 @Sql("/truncate.sql")
 class OrdersServiceTest {
 
-    private final OrdersDao ordersDao;
-    private final CartItemDao cartItemDao;
     private final OrdersService ordersService;
     private final ProductService productService;
     private final CartItemService cartItemService;
     private final CustomerService customerService;
 
-    public OrdersServiceTest(OrdersDao ordersDao, CartItemDao cartItemDao, OrdersService ordersService,
-                             ProductService productService, CartItemService cartItemService,
-                             CustomerService customerService) {
-        this.ordersDao = ordersDao;
-        this.cartItemDao = cartItemDao;
+    public OrdersServiceTest(OrdersService ordersService, ProductService productService,
+                             CartItemService cartItemService, CustomerService customerService) {
         this.ordersService = ordersService;
         this.productService = productService;
         this.cartItemService = cartItemService;
